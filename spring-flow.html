@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring 5 流程图可视化</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #536976 0%, #292E49 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+            padding: 44px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.6em;
+            color: #1a237e;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #455a64;
+            margin-bottom: 42px;
+            font-size: 1.1em;
+        }
+
+        .toc {
+            background: #f5f7fa;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 42px;
+        }
+
+        .toc h3 {
+            color: #1a237e;
+            margin-bottom: 16px;
+        }
+
+        .toc ul {
+            list-style: none;
+            columns: 2;
+            column-gap: 30px;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: #3949ab;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .toc a:hover {
+            color: #5c6bc0;
+            text-decoration: underline;
+        }
+
+        .diagram-section {
+            margin-bottom: 56px;
+            padding: 32px;
+            background: #fafafa;
+            border-radius: 12px;
+            border-left: 5px solid #3949ab;
+        }
+
+        .diagram-section h2 {
+            color: #1a237e;
+            font-size: 1.9em;
+            margin-bottom: 16px;
+        }
+
+        .diagram-container {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow-x: auto;
+        }
+
+        .diagram-container + .diagram-container {
+            margin-top: 24px;
+        }
+
+        .mermaid {
+            min-height: 320px;
+        }
+
+        .description {
+            margin-top: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            color: #455a64;
+            line-height: 1.65;
+            box-shadow: inset 0 0 0 1px rgba(57, 73, 171, 0.08);
+        }
+
+        .description h3 {
+            color: #3949ab;
+            margin-bottom: 12px;
+        }
+
+        .description ul {
+            margin: 12px 0 12px 22px;
+        }
+
+        .description li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: #eceff1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+            font-size: 0.95em;
+            color: #d81b60;
+        }
+
+        @media print {
+            body {
+                background: #ffffff;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .toc ul {
+                columns: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌱 Spring 5 核心流程图可视化</h1>
+        <p class="subtitle">覆盖 Spring Framework 5.x 核心容器、MVC、WebFlux、AOP、事务、Boot 等关键机制的流程解析</p>
+
+        <div class="toc">
+            <h3>📑 目录导航</h3>
+            <ul>
+                <li><a href="#spring-core">1. Spring 核心容器概览</a></li>
+                <li><a href="#bean-loading">2. Bean 定义加载流程</a></li>
+                <li><a href="#bean-lifecycle">3. Bean 生命周期完整流程</a></li>
+                <li><a href="#context-refresh">4. ApplicationContext 刷新流程</a></li>
+                <li><a href="#dependency-injection">5. 依赖注入解析与装配流程</a></li>
+                <li><a href="#beanpostprocessor">6. BeanPostProcessor 调用链</a></li>
+                <li><a href="#spring-aop">7. Spring AOP 代理创建流程</a></li>
+                <li><a href="#spring-transaction">8. 声明式事务管理流程</a></li>
+                <li><a href="#spring-mvc">9. Spring MVC 请求处理流程</a></li>
+                <li><a href="#spring-webflux">10. Spring WebFlux 响应式请求流程</a></li>
+                <li><a href="#spring-boot">11. Spring Boot 启动流程</a></li>
+                <li><a href="#spring-autoconfig">12. 自动配置筛选与生效流程</a></li>
+                <li><a href="#spring-events">13. 应用事件发布与监听机制</a></li>
+                <li><a href="#spring-scheduling">14. 调度与异步执行流程</a></li>
+                <li><a href="#spring-glossary">15. 核心概念速览</a></li>
+            </ul>
+        </div>
+
+        <!-- Section 1 -->
+        <div class="diagram-section" id="spring-core">
+            <h2>1. Spring 核心容器概览</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+graph TD
+    A[ApplicationContext] --> B[BeanFactory<br/>核心 Bean 管理]
+    A --> C[Environment<br/>配置与 Profiles]
+    A --> D[ResourceLoader<br/>资源加载]
+    A --> E[ApplicationEventMulticaster<br/>事件广播]
+    A --> F[LifecycleProcessor<br/>生命周期控制]
+
+    B --> G[BeanDefinitionRegistry<br/>Bean 定义注册表]
+    G --> H[BeanDefinition<br/>Bean 元数据]
+    B --> I[SingletonObjects<br/>一级缓存]
+    B --> J[Prototype Beans<br/>原型实例]
+
+    C --> K[PropertySources]
+    D --> L[Resource]
+
+    style A fill:#4caf50,color:#fff
+    style B fill:#ffcc80
+    style C fill:#90caf9
+    style D fill:#90caf9
+    style E fill:#f48fb1
+    style F fill:#a5d6a7
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>ApplicationContext 聚合 BeanFactory、Environment、事件广播、资源加载等模块能力。</li>
+                    <li>BeanDefinitionRegistry 持有 Bean 元数据，驱动实例化及生命周期管理。</li>
+                    <li>单例 Bean 缓存在一级缓存中，原型 Bean 每次请求都会重新创建。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="diagram-section" id="bean-loading">
+            <h2>2. Bean 定义加载流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant App as 应用启动
+    participant AC as AnnotationConfigApplicationContext
+    participant Reader as AnnotatedBeanDefinitionReader
+    participant Scanner as ClassPathScanner
+    participant Registry as BeanDefinitionRegistry
+
+    App->>AC: new AnnotationConfigApplicationContext(...)
+    AC->>Reader: register(configClasses)
+    Reader->>Registry: 注册配置类 BeanDefinition
+    Reader->>Scanner: 扫描 @Component / @Bean
+    Scanner->>Registry: 注册候选 BeanDefinition
+    Registry-->>AC: Bean 定义注册完成
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>注解驱动容器由 AnnotatedBeanDefinitionReader 与 ClassPathScanner 协同注册 Bean 定义。</li>
+                    <li>XML 配置场景由 XmlBeanDefinitionReader 等实现完成加载，原理一致。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="diagram-section" id="bean-lifecycle">
+            <h2>3. Bean 生命周期完整流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+flowchart TD
+    Start[准备实例化 Bean] --> Instantiate[实例化<br/>Constructor 或 FactoryMethod]
+    Instantiate --> Populate[属性填充<br/>依赖注入]
+    Populate --> Aware[回调 *Aware 接口]
+    Aware --> BeforeInit[BeanPostProcessor.postProcessBeforeInitialization]
+    BeforeInit --> InitMethod[执行初始化方法<br/>InitializingBean.afterPropertiesSet / @PostConstruct / init-method]
+    InitMethod --> AfterInit[BeanPostProcessor.postProcessAfterInitialization]
+    AfterInit --> Ready[Bean 准备就绪]
+    Ready --> Destroy[容器关闭触发销毁]
+    Destroy --> DestroyCallbacks[DisposableBean.destroy / @PreDestroy / destroy-method]
+
+    style Start fill:#e0f7fa
+    style Ready fill:#a5d6a7
+    style Destroy fill:#ef9a9a
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>BeanPostProcessor 在初始化前后介入，是 AOP、@Autowired 等功能的基础。</li>
+                    <li>销毁阶段仅对非 prototype Bean 生效，原型 Bean 需调用方手动销毁。</li>
+                </ul>
+            </div>
+            <div class="description">
+                <h3>代码示例：Bean 生命周期与 BeanPostProcessor</h3>
+                <p>1) Bean 的生命周期回调：@PostConstruct / @PreDestroy 与 InitializingBean / DisposableBean</p>
+                <pre><code class="language-java">import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
+
+@Component
+public class PaymentClient implements InitializingBean, DisposableBean {
+    public PaymentClient() {
+        System.out.println("1) 构造函数");
+    }
+
+    @PostConstruct // 依赖注入完成后调用
+    public void init() {
+        System.out.println("2) @PostConstruct 初始化");
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        System.out.println("3) InitializingBean.afterPropertiesSet");
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        System.out.println("5) @PreDestroy 清理资源");
+    }
+
+    @Override
+    public void destroy() {
+        System.out.println("6) DisposableBean.destroy");
+    }
+}</code></pre>
+
+                <p>2) 自定义 BeanPostProcessor：在初始化前后织入横切逻辑</p>
+                <pre><code class="language-java">import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.stereotype.Component;
+
+@Component
+public class AuditBeanPostProcessor implements BeanPostProcessor {
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        if (bean instanceof PaymentClient) {
+            System.out.println("4) BeforeInitialization: " + beanName);
+        }
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        if (bean instanceof PaymentClient) {
+            System.out.println("4.5) AfterInitialization: " + beanName);
+        }
+        return bean;
+    }
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="diagram-section" id="context-refresh">
+            <h2>4. ApplicationContext 刷新流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant C as ApplicationContext
+    C->>C: refresh()
+    C->>C: prepareRefresh
+    C->>C: obtainFreshBeanFactory
+    C->>C: prepareBeanFactory
+    C->>C: invokeBeanFactoryPostProcessors
+    C->>C: registerBeanPostProcessors
+    C->>C: initMessageSource
+    C->>C: initApplicationEventMulticaster
+    C->>C: onRefresh
+    C->>C: registerListeners
+    C->>C: finishBeanFactoryInitialization
+    C->>C: finishRefresh
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>BeanFactoryPostProcessor 在 Bean 实例化前运行，可批量修改 BeanDefinition。</li>
+                    <li>BeanPostProcessor 注册完成后才进行单例 Bean 创建，确保扩展点能参与生命周期。</li>
+                </ul>
+            </div>
+            <div class="description">
+                <h3>代码示例：在刷新阶段调优 Bean 定义</h3>
+                <pre><code class="language-java">import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class AppBootstrapTuning implements BeanFactoryPostProcessor {
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        if (beanFactory.containsBeanDefinition("taskExecutor")) {
+            BeanDefinition def = beanFactory.getBeanDefinition("taskExecutor");
+            // 在容器刷新阶段覆盖属性
+            def.getPropertyValues().add("corePoolSize", 8);
+            def.getPropertyValues().add("maxPoolSize", 32);
+        }
+    }
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- Section 5 -->
+        <div class="diagram-section" id="dependency-injection">
+            <h2>5. 依赖注入解析与装配流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant BF as AutowireCapableBeanFactory
+    participant BD as BeanDefinition
+    participant DD as DependencyDescriptor
+    participant Resolver as DependencyResolver
+    participant Candidates as 候选 Beans
+
+    BF->>BD: 遍历需要注入的属性/构造参数
+    BD->>DD: 创建 DependencyDescriptor
+    DD->>Resolver: 请求依赖解析
+    Resolver->>Candidates: 查找 @Qualifier / @Primary / 类型匹配
+    Candidates-->>Resolver: 返回匹配结果
+    Resolver->>BF: 选定 Bean 实例 / 值
+    BF->>BD: 注入属性
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>依赖解析优先级：@Lookup → @Autowired → @Qualifier → @Primary → Bean 名称 → 按类型匹配。</li>
+                    <li>循环依赖通过三级缓存（singletonFactories）暴露提前引用解决。</li>
+                </ul>
+            </div>
+            <div class="description">
+                <h3>代码示例：构造器注入与 @Qualifier/@Primary</h3>
+                <pre><code class="language-java">public interface PaymentGateway {
+    void charge(long amount);
+}</code></pre>
+                <pre><code class="language-java">import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+
+@Component
+@Primary // 默认优先被注入
+public class StripeGateway implements PaymentGateway {
+    public void charge(long amount) { /* 调用 Stripe API */ }
+}</code></pre>
+                <pre><code class="language-java">import org.springframework.stereotype.Component;
+
+@Component("paypalGateway")
+public class PaypalGateway implements PaymentGateway {
+    public void charge(long amount) { /* 调用 PayPal API */ }
+}</code></pre>
+                <pre><code class="language-java">import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+@Service
+public class BillingService {
+    private final PaymentGateway gateway;
+
+    public BillingService(@Qualifier("paypalGateway") PaymentGateway gateway) {
+        this.gateway = gateway;
+    }
+
+    public void pay(long amount) {
+        gateway.charge(amount);
+    }
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- Section 6 -->
+        <div class="diagram-section" id="beanpostprocessor">
+            <h2>6. BeanPostProcessor 调用链</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+graph TD
+    A[Bean 创建流程] --> B1[InstantiationAwareBeanPostProcessor<br/>postProcessBeforeInstantiation]
+    B1 --> B2[实例化 Bean]
+    B2 --> B3[InstantiationAwareBeanPostProcessor<br/>postProcessAfterInstantiation]
+    B3 --> B4[SmartInstantiationAwareBeanPostProcessor<br/>getEarlyBeanReference]
+    B4 --> B5[属性填充]
+    B5 --> B6[InstantiationAwareBeanPostProcessor<br/>postProcessProperties]
+    B6 --> B7[BeanPostProcessor<br/>postProcessBeforeInitialization]
+    B7 --> B8[Bean 初始化方法]
+    B8 --> B9[BeanPostProcessor<br/>postProcessAfterInitialization]
+    B9 --> Ready[Bean 可用 / 进入一级缓存]
+
+    style Ready fill:#aed581
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>SmartInstantiationAwareBeanPostProcessor#getEarlyBeanReference 用于提前暴露代理 Bean。</li>
+                    <li>配置绑定、数据校验、AOP 等扩展均依赖该链路中的不同回调。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 7 -->
+        <div class="diagram-section" id="spring-aop">
+            <h2>7. Spring AOP 代理创建流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant Container as ApplicationContext
+    participant AutoProxyCreator as AnnotationAwareAspectJAutoProxyCreator
+    participant Advisor as Advisor/Advice
+    participant ProxyFactory as ProxyFactory
+    participant Bean as 目标 Bean
+    participant Client as 调用方
+
+    Container->>AutoProxyCreator: 创建 Bean 前回调
+    AutoProxyCreator->>Advisor: 检索匹配的切面/通知
+    Advisor-->>AutoProxyCreator: 返回候选 Advisor 列表
+    AutoProxyCreator->>ProxyFactory: 构建代理所需信息
+    ProxyFactory->>Bean: 创建代理(基于 JDK 动态代理或 CGLIB)
+    ProxyFactory-->>Container: 返回代理 Bean
+    Container-->>Client: 暴露代理对象
+    Client->>ProxyFactory: 调用方法
+    ProxyFactory->>Advisor: 执行拦截链 (MethodInterceptor)
+    Advisor->>Bean: 调用真实方法
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>存在接口时优先使用 JDK Proxy，无接口时回退到 CGLIB。</li>
+                    <li>MethodInterceptor 组成的责任链负责执行前置、后置、环绕等通知。</li>
+                </ul>
+            </div>
+            <div class="description">
+                <h3>代码示例：声明式 AOP（记录接口调用时长）</h3>
+                <pre><code class="language-java">import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+@Slf4j
+public class TimingAspect {
+    @Around("execution(* com.example.service..*Service.*(..))")
+    public Object time(ProceedingJoinPoint pjp) throws Throwable {
+        long start = System.currentTimeMillis();
+        try {
+            return pjp.proceed();
+        } finally {
+            long cost = System.currentTimeMillis() - start;
+            log.info("Method {} took {} ms", pjp.getSignature(), cost);
+        }
+    }
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- Section 8 -->
+        <div class="diagram-section" id="spring-transaction">
+            <h2>8. 声明式事务管理流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+flowchart TD
+    Start[@Transactional 方法调用] --> Interceptor[TransactionInterceptor]
+    Interceptor --> AttrSource[TransactionAttributeSource<br/>解析事务属性]
+    AttrSource --> Manager[PlatformTransactionManager<br/>如 DataSourceTransactionManager]
+    Manager --> Begin[获取/创建物理事务]
+    Begin --> Invoke[执行目标方法]
+    Invoke --> Check{是否抛出异常?}
+    Check -->|否| Commit[提交事务]
+    Check -->|是| Rollback[回滚事务]
+    Commit --> Cleanup[清理线程绑定资源]
+    Rollback --> Cleanup
+    Cleanup --> End[返回调用方]
+
+    style Start fill:#4caf50,color:#fff
+    style Commit fill:#81c784
+    style Rollback fill:#e57373
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>事务属性包含传播行为、隔离级别、超时时间与回滚规则。</li>
+                    <li>TransactionSynchronizationManager 负责将资源绑定到当前线程，保证事务上下文。</li>
+                </ul>
+            </div>
+            <div class="description">
+                <h3>代码示例：@Transactional 与事务管理器</h3>
+                <pre><code class="language-java">import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import javax.sql.DataSource;
+
+@Configuration
+@EnableTransactionManagement
+public class TxConfig {
+    @Bean
+    public PlatformTransactionManager txManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
+    }
+}</code></pre>
+                <pre><code class="language-java">import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class OrderService {
+    private final PaymentGateway gateway;
+    public OrderService(PaymentGateway gateway) { this.gateway = gateway; }
+
+    @Transactional
+    public void placeOrder(Order order) {
+        gateway.charge(order.total());
+        // 持久化订单等操作
+    }
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- Section 9 -->
+        <div class="diagram-section" id="spring-mvc">
+            <h2>9. Spring MVC 请求处理流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant Client as 浏览器/客户端
+    participant DS as DispatcherServlet
+    participant HM as HandlerMapping
+    participant HA as HandlerAdapter
+    participant Controller as Controller/Handler
+    participant ViewResolver as ViewResolver
+    participant View as View
+
+    Client->>DS: HTTP 请求
+    DS->>HM: 查找 HandlerMapping
+    HM-->>DS: 返回 HandlerExecutionChain
+    DS->>HA: 获取相应 HandlerAdapter
+    HA->>Controller: 调用控制器方法
+    Controller-->>HA: 返回 ModelAndView / ResponseEntity
+    HA-->>DS: 传递处理结果
+    DS->>ViewResolver: 解析视图 (若非直接写响应)
+    ViewResolver-->>DS: 返回 View
+    DS->>View: 渲染模型
+    View-->>Client: 输出响应
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>HandlerInterceptor 可在执行链中拦截，实现认证、日志等横切逻辑。</li>
+                    <li>MessageConverter 对 @RequestBody/@ResponseBody 进行序列化与反序列化。</li>
+                </ul>
+            </div>
+            <div class="description">
+                <h3>代码示例：Controller + 拦截器注册</h3>
+                <pre><code class="language-java">import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class OrderController {
+    private final OrderService service;
+    public OrderService(OrderService service) { this.service = service; }
+
+    @GetMapping("/orders/{id}")
+    public OrderView get(@PathVariable Long id) {
+        return service.findView(id);
+    }
+}</code></pre>
+                <pre><code class="language-java">import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+
+@Component
+public class AuthInterceptor implements HandlerInterceptor {
+    @Override
+    public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler) throws Exception {
+        String token = req.getHeader("X-Auth");
+        if (token == null || token.isBlank()) {
+            res.setStatus(401);
+            return false;
+        }
+        return true;
+    }
+}</code></pre>
+                <pre><code class="language-java">import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    @Autowired
+    private AuthInterceptor authInterceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(authInterceptor).addPathPatterns("/**");
+    }
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- Section 10 -->
+        <div class="diagram-section" id="spring-webflux">
+            <h2>10. Spring WebFlux 响应式请求流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant Client as Reactive Client
+    participant WebHandler as DispatcherHandler
+    participant Router as RouterFunction
+    participant Handler as HandlerFunction
+    participant Publisher as Mono/Flux
+    participant Server as Netty/Undertow
+
+    Client->>Server: HTTP 请求
+    Server->>WebHandler: 交给 DispatcherHandler
+    WebHandler->>Router: 匹配路由
+    Router-->>WebHandler: 返回 HandlerFunction
+    WebHandler->>Handler: 调用处理函数
+    Handler-->>WebHandler: 返回 Mono/Flux
+    WebHandler->>Publisher: 订阅数据流
+    Publisher-->>Server: 推送响应数据
+    Server-->>Client: 响应流式返回
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>基于 Reactor 的非阻塞执行模型，默认使用 Netty 运行时。</li>
+                    <li>WebFilter / HandlerFilterFunction 可在响应式链路中处理跨域、鉴权等逻辑。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 11 -->
+        <div class="diagram-section" id="spring-boot">
+            <h2>11. Spring Boot 启动流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+flowchart TD
+    Start[SpringApplication.run] --> CreateApp[构造 SpringApplication]
+    CreateApp --> Infer[推断 WebApplicationType]
+    Infer --> PrepareEnv[ApplicationContextInitializer<br/>Environment 处理]
+    PrepareEnv --> Listeners[SpringApplicationRunListeners<br/>发布事件]
+    Listeners --> Context[创建 ApplicationContext]
+    Context --> LoadSources[加载主配置类 / SpringBootApplication]
+    LoadSources --> Refresh[调用 context.refresh]
+    Refresh --> CallRunners[ApplicationRunner / CommandLineRunner]
+    CallRunners --> Ready[应用启动完成]
+
+    style Start fill:#1976d2,color:#fff
+    style Ready fill:#81c784
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>SpringFactoriesLoader 统一加载自动配置、Initializer、Listener 等 SPI。</li>
+                    <li>启动事件序列：ApplicationStarting → EnvironmentPrepared → Prepared → Started → Ready。</li>
+                </ul>
+            </div>
+            <div class="description">
+                <h3>代码示例：应用启动类与 ApplicationRunner</h3>
+                <pre><code class="language-java">import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+
+    @Bean
+    public CommandLineRunner init() {
+        return args -&gt; System.out.println("Application started. Init data...");
+    }
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- Section 12 -->
+        <div class="diagram-section" id="spring-autoconfig">
+            <h2>12. 自动配置筛选与生效流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+graph TD
+    A[SpringFactoriesLoader<br/>读取 META-INF/spring.factories] --> B[AutoConfigurationImportSelector]
+    B --> C[加载所有候选 auto-configurations]
+    C --> D[排除 @EnableAutoConfiguration 配置]
+    D --> E[过滤 spring.autoconfigure.exclude]
+    E --> F[应用 AutoConfigurationImportFilter<br/>条件过滤]
+    F --> G[处理条件注解与属性]
+    G --> H[最终导入的自动配置类]
+    H --> I[注册 BeanDefinition]
+
+    style H fill:#4db6ac,color:#fff
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>条件注解（ConditionalOnClass、OnMissingBean、OnProperty 等）决定自动配置是否生效。</li>
+                    <li>AutoConfigurationReportLoggingInitializer 可输出自动配置启用/失效的原因。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 13 -->
+        <div class="diagram-section" id="spring-events">
+            <h2>13. 应用事件发布与监听机制</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant Publisher as ApplicationEventPublisher
+    participant Multicaster as ApplicationEventMulticaster
+    participant Listener1 as ApplicationListener&lt;A&gt;
+    participant Listener2 as ApplicationListener&lt;B&gt;
+    participant Listener3 as @EventListener
+
+    Publisher->>Multicaster: publishEvent(event)
+    Multicaster->>Listener1: onApplicationEvent (异步/同步)
+    Multicaster->>Listener2: onApplicationEvent
+    Multicaster->>Listener3: 调用标注方法
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>SimpleApplicationEventMulticaster 默认同步执行，可配置 TaskExecutor 变为异步模式。</li>
+                    <li>@TransactionalEventListener 支持在事务提交后再触发监听逻辑。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 14 -->
+        <div class="diagram-section" id="spring-scheduling">
+            <h2>14. 调度与异步执行流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+flowchart TD
+    Start[@EnableScheduling / @EnableAsync] --> Registrar[Registrar 注册后处理器]
+    Registrar --> SchedulerProcessor[ScheduledAnnotationBeanPostProcessor]
+    Registrar --> AsyncProcessor[AsyncAnnotationBeanPostProcessor]
+
+    SchedulerProcessor --> ParseScheduled[解析 @Scheduled 方法]
+    ParseScheduled --> RegisterTask[注册到 TaskScheduler]
+    TaskScheduler --> ExecuteTask[按 Cron / fixedDelay 执行任务]
+
+    AsyncProcessor --> ParseAsync[解析 @Async 方法]
+    ParseAsync --> WrapProxy[创建代理包装方法]
+    WrapProxy --> SubmitExecutor[提交到 TaskExecutor]
+
+    style ExecuteTask fill:#ffcc80
+    style SubmitExecutor fill:#90caf9
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <ul>
+                    <li>TaskScheduler 默认实现为 ThreadPoolTaskScheduler，可通过自定义 Bean 覆盖。</li>
+                    <li>@Async 默认使用 SimpleAsyncTaskExecutor，生产环境建议配置 ThreadPoolTaskExecutor。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 15 -->
+        <div class="diagram-section" id="spring-glossary">
+            <h2>15. 核心概念速览</h2>
+            <div class="description">
+                <ul>
+                    <li><strong>ApplicationContext</strong>：容器顶层接口，提供 Bean 管理、事件、国际化、环境等扩展能力。</li>
+                    <li><strong>BeanFactoryPostProcessor / BeanPostProcessor</strong>：分别用于修改 BeanDefinition 与 Bean 实例的扩展点。</li>
+                    <li><strong>SmartLifecycle</strong>：生命周期扩展接口，支持分阶段启动与停止。</li>
+                    <li><strong>Resource / Environment / PropertySources</strong>：提供统一的配置属性解析能力。</li>
+                    <li><strong>DispatcherServlet / DispatcherHandler</strong>：Servlet MVC 与 WebFlux 的请求分发核心。</li>
+                    <li><strong>PlatformTransactionManager</strong>：事务管理抽象，整合 JDBC、JPA、R2DBC 等实现。</li>
+                    <li><strong>AutoConfiguration</strong>：Spring Boot 条件化配置机制，结合 SPI 与条件注解生效。</li>
+                </ul>
+                <p style="margin-top: 16px;">✅ 建议配合 Spring 官方文档、源码调试阅读，使用支持 Mermaid 的 Markdown/HTML 查看器即可即时渲染以上流程图。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 确保 Mermaid 库和 DOM 都加载完成后再初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof mermaid !== 'undefined') {
+                mermaid.initialize({
+                    startOnLoad: true,
+                    theme: 'default',
+                    securityLevel: 'loose',
+                    flowchart: {
+                        useMaxWidth: true,
+                        htmlLabels: true,
+                        curve: 'basis'
+                    },
+                    sequence: {
+                        diagramMarginX: 50,
+                        diagramMarginY: 16,
+                        actorMargin: 50,
+                        width: 150,
+                        height: 65,
+                        messageMargin: 40
+                    }
+                });
+            } else {
+                console.error('Mermaid 库加载失败，请检查 CDN 链接');
+                // 备用 CDN
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/mermaid@10.9.1/dist/mermaid.min.js';
+                script.onload = function() {
+                    mermaid.initialize({
+                        startOnLoad: true,
+                        theme: 'default',
+                        securityLevel: 'loose',
+                        flowchart: {
+                            useMaxWidth: true,
+                            htmlLabels: true,
+                            curve: 'basis'
+                        },
+                        sequence: {
+                            diagramMarginX: 50,
+                            diagramMarginY: 16,
+                            actorMargin: 50,
+                            width: 150,
+                            height: 65,
+                            messageMargin: 40
+                        }
+                    });
+                };
+                document.head.appendChild(script);
+            }
+        });
+    </script>
+</body>
+</html>
+

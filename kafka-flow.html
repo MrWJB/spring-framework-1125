@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kafka 流程图可视化</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .diagram-section {
+            margin-bottom: 60px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .diagram-section h2 {
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .mermaid {
+            text-align: center;
+            min-height: 300px;
+        }
+
+        .description {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 6px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .description h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .description ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .description li {
+            margin-bottom: 8px;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+        }
+
+        .toc h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 1.05em;
+            transition: color 0.3s;
+        }
+
+        .toc a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Kafka 流程图可视化</h1>
+        <p class="subtitle">Apache Kafka 核心架构与工作流程完整图解</p>
+
+        <div class="toc">
+            <h3>📑 目录导航</h3>
+            <ul>
+                <li><a href="#diagram1">1. Kafka 整体架构图</a></li>
+                <li><a href="#diagram2">2. Producer 发送消息流程</a></li>
+                <li><a href="#diagram3">3. Consumer 消费消息流程</a></li>
+                <li><a href="#diagram4">4. Topic 和 Partition 分布流程</a></li>
+                <li><a href="#diagram5">5. Consumer Group 负载均衡流程</a></li>
+                <li><a href="#diagram6">6. 消息存储和持久化流程</a></li>
+                <li><a href="#diagram7">7. 高可用性(HA)和容错流程</a></li>
+                <li><a href="#diagram8">8. 完整的数据流向图</a></li>
+                <li><a href="#diagram9">9. KRaft模式高可用架构 (Kafka 3.3+)</a></li>
+                <li><a href="#diagram10">10. KRaft Controller选举和故障转移流程</a></li>
+                <li><a href="#raft-algorithm">11. Raft算法详解及内部原理</a></li>
+                <li><a href="#zookeeper-algorithm">12. Zookeeper算法详解及内部原理</a></li>
+            </ul>
+        </div>
+
+        <!-- 图表1: Kafka 整体架构图 -->
+        <div class="diagram-section" id="diagram1">
+            <h2>1. Kafka 整体架构图</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+graph TB
+    subgraph "Producer 生产者"
+        P1[Producer 1]
+        P2[Producer 2]
+        P3[Producer 3]
+    end
+    
+    subgraph "Kafka Cluster 集群"
+        subgraph "Broker 1"
+            B1[Broker 1]
+            T1[Topic A<br/>Partition 0]
+            T2[Topic A<br/>Partition 1]
+            T3[Topic B<br/>Partition 0]
+        end
+        
+        subgraph "Broker 2"
+            B2[Broker 2]
+            T4[Topic A<br/>Partition 2]
+            T5[Topic B<br/>Partition 1]
+        end
+        
+        subgraph "Broker 3"
+            B3[Broker 3]
+            T6[Topic B<br/>Partition 2]
+        end
+        
+        ZK[Zookeeper<br/>协调服务]
+    end
+    
+    subgraph "Consumer 消费者"
+        CG1[Consumer Group 1]
+        CG2[Consumer Group 2]
+        C1[Consumer 1]
+        C2[Consumer 2]
+        C3[Consumer 3]
+        C4[Consumer 4]
+    end
+    
+    P1 -->|发送消息| B1
+    P2 -->|发送消息| B2
+    P3 -->|发送消息| B3
+    
+    B1 --> ZK
+    B2 --> ZK
+    B3 --> ZK
+    
+    CG1 --> C1
+    CG1 --> C2
+    CG2 --> C3
+    CG2 --> C4
+    
+    C1 -->|消费| B1
+    C2 -->|消费| B2
+    C3 -->|消费| B3
+    C4 -->|消费| B1
+    
+    style P1 fill:#e1f5ff
+    style P2 fill:#e1f5ff
+    style P3 fill:#e1f5ff
+    style B1 fill:#fff4e1
+    style B2 fill:#fff4e1
+    style B3 fill:#fff4e1
+    style C1 fill:#e8f5e9
+    style C2 fill:#e8f5e9
+    style C3 fill:#e8f5e9
+    style C4 fill:#e8f5e9
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <p>展示了Kafka集群的完整架构，包括Producer（生产者）、Broker集群、Zookeeper协调服务以及Consumer（消费者）之间的关系。不同颜色代表不同的组件类型。</p>
+            </div>
+        </div>
+
+        <!-- 图表2: Producer 发送消息流程 -->
+        <div class="diagram-section" id="diagram2">
+            <h2>2. Producer 发送消息流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant App as 应用程序
+    participant P as Producer
+    participant Ser as 序列化器
+    participant Part as 分区器
+    participant Buffer as 消息缓冲区
+    participant Net as 网络线程
+    participant Broker as Kafka Broker
+    
+    App->>P: 创建ProducerRecord
+    P->>Ser: 序列化Key和Value
+    Ser->>Part: 选择分区
+    Part->>Buffer: 添加到缓冲区
+    Buffer->>Buffer: 批量积累消息
+    Buffer->>Net: 达到阈值或超时
+    Net->>Net: 构建请求
+    Net->>Broker: 发送消息批次
+    Broker-->>Net: 返回确认(ACK)
+    Net-->>P: 回调ProducerCallback
+    P-->>App: 返回结果
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <p>展示了Producer发送消息的完整流程：从应用程序创建消息记录，经过序列化、分区选择、批量缓冲，最终发送到Kafka Broker并获得确认。</p>
+            </div>
+        </div>
+
+        <!-- 图表3: Consumer 消费消息流程 -->
+        <div class="diagram-section" id="diagram3">
+            <h2>3. Consumer 消费消息流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant App as 应用程序
+    participant C as Consumer
+    participant CG as ConsumerGroup协调器
+    participant Broker as Kafka Broker
+    
+    App->>C: 创建Consumer并订阅Topic
+    C->>CG: 加入Consumer Group
+    CG->>CG: 进行Rebalance
+    CG-->>C: 分配Partition
+    C->>Broker: 拉取消息(FetchRequest)
+    Broker-->>C: 返回消息批次
+    C->>C: 处理消息
+    C->>Broker: 提交Offset(自动/手动)
+    Broker-->>C: 确认Offset提交
+    C-->>App: 返回消费结果
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <p>展示了Consumer消费消息的完整流程：订阅Topic、加入Consumer Group、进行Rebalance分配Partition、拉取消息、处理消息并提交Offset。</p>
+            </div>
+        </div>
+
+        <!-- 图表4: Topic 和 Partition 分布流程 -->
+        <div class="diagram-section" id="diagram4">
+            <h2>4. Topic 和 Partition 分布流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+graph LR
+    subgraph "Topic: orders"
+        P0[Partition 0<br/>Leader: Broker1<br/>Replicas: B1,B2,B3]
+        P1[Partition 1<br/>Leader: Broker2<br/>Replicas: B2,B3,B1]
+        P2[Partition 2<br/>Leader: Broker3<br/>Replicas: B3,B1,B2]
+    end
+    
+    Producer[Producer] -->|消息1| P0
+    Producer -->|消息2| P1
+    Producer -->|消息3| P2
+    
+    P0 -->|复制| Follower1[Follower副本]
+    P1 -->|复制| Follower2[Follower副本]
+    P2 -->|复制| Follower3[Follower副本]
+    
+    Consumer[Consumer Group] -->|消费| P0
+    Consumer -->|消费| P1
+    Consumer -->|消费| P2
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <p>展示了Topic如何被分割为多个Partition，每个Partition的Leader和Replicas分布，以及Producer和Consumer如何与Partition交互。</p>
+            </div>
+        </div>
+
+        <!-- 图表5: Consumer Group 负载均衡流程 -->
+        <div class="diagram-section" id="diagram5">
+            <h2>5. Consumer Group 负载均衡流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+graph TD
+    Start[Consumer Group启动] --> Join[消费者加入Group]
+    Join --> Elect[选举Group Coordinator]
+    Elect --> JoinReq[发送JoinGroup请求]
+    JoinReq --> Wait[等待所有消费者加入]
+    Wait --> Rebalance{开始Rebalance}
+    
+    Rebalance --> Assign[Coordinator分配Partition]
+    Assign --> Sync[发送SyncGroup请求]
+    Sync --> Consume[开始消费分配到的Partition]
+    
+    Consume --> Check{有新Consumer加入<br/>或Consumer离开?}
+    Check -->|是| Rebalance
+    Check -->|否| Continue[继续消费]
+    Continue --> Check
+    
+    style Rebalance fill:#ffeb3b
+    style Consume fill:#4caf50
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <p>展示了Consumer Group的负载均衡机制（Rebalance），包括Consumer加入、Partition分配、以及动态调整的过程。</p>
+            </div>
+        </div>
+
+        <!-- 图表6: 消息存储和持久化流程 -->
+        <div class="diagram-section" id="diagram6">
+            <h2>6. 消息存储和持久化流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+graph LR
+    subgraph "Kafka Broker"
+        Receive[接收消息] --> Validate[验证消息]
+        Validate --> Append[追加到Log文件]
+        Append --> Index[更新索引文件]
+        Index --> Replicate[复制到Follower]
+        Replicate --> Flush[刷新到磁盘]
+        Flush --> Commit[提交Offset]
+    end
+    
+    Append --> LogFile[Segment Log<br/>.log文件]
+    Index --> IndexFile[Offset Index<br/>.index文件]
+    Index --> TimeIndex[Time Index<br/>.timeindex文件]
+    
+    style Append fill:#2196f3
+    style Replicate fill:#ff9800
+    style Flush fill:#4caf50
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <p>展示了Kafka Broker如何存储和持久化消息：接收消息后追加到Log文件，更新索引文件，复制到Follower副本，最后刷新到磁盘。</p>
+            </div>
+        </div>
+
+        <!-- 图表7: 高可用性(HA)和容错流程 -->
+        <div class="diagram-section" id="diagram7">
+            <h2>7. 高可用性(HA)和容错流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+graph TD
+    Start[正常状态] --> Leader[Leader处理请求]
+    Leader --> Follower[Follower同步数据]
+    
+    Leader --> Monitor[监控Leader健康状态]
+    Monitor --> Check{Leader是否存活?}
+    
+    Check -->|是| Continue[继续运行]
+    Check -->|否| Detect[检测到Leader故障]
+    
+    Detect --> Elect[从ISR中选择新Leader]
+    Elect --> Update[更新元数据]
+    Update --> Recover[恢复服务]
+    Recover --> NewLeader[新Leader开始服务]
+    
+    Continue --> Monitor
+    
+    style Detect fill:#f44336
+    style Elect fill:#ff9800
+    style NewLeader fill:#4caf50
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <p>展示了Kafka的高可用性机制：当Leader Broker故障时，从ISR（In-Sync Replicas）中选择新的Leader，确保服务不中断。</p>
+            </div>
+        </div>
+
+        <!-- 图表8: 完整的数据流向图 -->
+        <div class="diagram-section" id="diagram8">
+            <h2>8. 完整的数据流向图</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+flowchart TD
+    subgraph "数据源"
+        Source1[数据源1]
+        Source2[数据源2]
+        Source3[数据源3]
+    end
+    
+    subgraph "Kafka Cluster"
+        subgraph "Topic A"
+            PA1[Partition 0]
+            PA2[Partition 1]
+            PA3[Partition 2]
+        end
+        
+        subgraph "Topic B"
+            PB1[Partition 0]
+            PB2[Partition 1]
+        end
+    end
+    
+    subgraph "数据消费"
+        Stream1[流处理应用]
+        DB1[数据库]
+        Cache1[缓存系统]
+        Monitor1[监控系统]
+    end
+    
+    Source1 -->|Producer发送| PA1
+    Source2 -->|Producer发送| PA2
+    Source3 -->|Producer发送| PA3
+    
+    PA1 -->|Consumer消费| Stream1
+    PA2 -->|Consumer消费| DB1
+    PA3 -->|Consumer消费| Cache1
+    
+    PB1 -->|Consumer消费| Monitor1
+    PB2 -->|Consumer消费| Stream1
+    
+    style Source1 fill:#e3f2fd
+    style Source2 fill:#e3f2fd
+    style Source3 fill:#e3f2fd
+    style Stream1 fill:#e8f5e9
+    style DB1 fill:#e8f5e9
+    style Cache1 fill:#e8f5e9
+    style Monitor1 fill:#e8f5e9
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <p>展示了Kafka在典型应用场景中的完整数据流向：从多个数据源通过Producer发送到不同的Topic和Partition，然后被不同的Consumer Group消费并分发到各种下游系统。</p>
+            </div>
+        </div>
+
+        <!-- 图表9: KRaft模式高可用架构 -->
+        <div class="diagram-section" id="diagram9">
+            <h2>9. KRaft模式高可用架构 (Kafka 3.3+)</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+graph TB
+    subgraph "Producer 生产者"
+        P1[Producer 1]
+        P2[Producer 2]
+    end
+    
+    subgraph "Kafka Cluster KRaft模式"
+        subgraph "Controller Quorum 控制器仲裁组"
+            C1[Controller 1<br/>Active Leader<br/>处理元数据请求]
+            C2[Controller 2<br/>Standby Follower]
+            C3[Controller 3<br/>Standby Follower]
+        end
+        
+        MetadataLog[Metadata Log<br/>__cluster_metadata<br/>元数据日志Topic]
+        
+        subgraph "Broker 节点 (数据节点)"
+            B1[Broker 1<br/>存储数据Partition]
+            B2[Broker 2<br/>存储数据Partition]
+            B3[Broker 3<br/>存储数据Partition]
+        end
+        
+        subgraph "Topic分区示例"
+            TP1[Topic A<br/>Partition 0<br/>Leader: B1]
+            TP2[Topic A<br/>Partition 1<br/>Leader: B2]
+            TP3[Topic B<br/>Partition 0<br/>Leader: B3]
+        end
+    end
+    
+    subgraph "Consumer 消费者"
+        CG[Consumer Group]
+        Cons1[Consumer 1]
+        Cons2[Consumer 2]
+    end
+    
+    P1 -->|发送消息| B1
+    P2 -->|发送消息| B2
+    
+    C1 -->|写入元数据变更| MetadataLog
+    C2 -->|同步读取| MetadataLog
+    C3 -->|同步读取| MetadataLog
+    
+    C1 -->|管理Partition分配| B1
+    C1 -->|管理Partition分配| B2
+    C1 -->|管理Partition分配| B3
+    C1 -->|管理Topic创建/删除| MetadataLog
+    
+    B1 --> TP1
+    B2 --> TP2
+    B3 --> TP3
+    
+    CG --> Cons1
+    CG --> Cons2
+    Cons1 -->|消费| B1
+    Cons2 -->|消费| B2
+    
+    style C1 fill:#ff6b6b
+    style C2 fill:#ffd93d
+    style C3 fill:#ffd93d
+    style MetadataLog fill:#a8e6cf
+    style B1 fill:#fff4e1
+    style B2 fill:#fff4e1
+    style B3 fill:#fff4e1
+    style P1 fill:#e1f5ff
+    style P2 fill:#e1f5ff
+    style Cons1 fill:#e8f5e9
+    style Cons2 fill:#e8f5e9
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <p><strong>KRaft模式 (Kafka Raft)</strong>是Kafka 3.3+版本引入的新架构，完全移除了对Zookeeper的依赖。核心特点：</p>
+                <ul>
+                    <li><strong>Controller Quorum</strong>：由多个Controller节点组成仲裁组，使用Raft共识算法选举Leader</li>
+                    <li><strong>Metadata Log</strong>：元数据存储在Kafka内部的特殊Topic（__cluster_metadata）中，而不是Zookeeper</li>
+                    <li><strong>Active Leader</strong>：只有一个Controller作为Leader处理元数据请求</li>
+                    <li><strong>Standby Followers</strong>：其他Controller作为Follower同步元数据，Leader故障时自动选举新Leader</li>
+                    <li><strong>Broker节点</strong>：专注于数据存储和处理，不再需要与Zookeeper交互</li>
+                    <li><strong>优势</strong>：简化架构、提高性能、支持更大规模集群、更快的故障恢复</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 图表10: KRaft Controller选举和故障转移流程 -->
+        <div class="diagram-section" id="diagram10">
+            <h2>10. KRaft Controller选举和故障转移流程</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant C1 as Controller 1<br/>(Leader)
+    participant C2 as Controller 2<br/>(Follower)
+    participant C3 as Controller 3<br/>(Follower)
+    participant ML as Metadata Log
+    participant B as Broker节点
+    
+    Note over C1,ML: 正常运行时
+    C1->>ML: 写入元数据变更
+    C2->>ML: 同步读取元数据
+    C3->>ML: 同步读取元数据
+    C1->>B: 发送元数据更新
+    B-->>C1: 确认接收
+    
+    Note over C1,C3: Controller Leader故障
+    C1-xC2: 心跳超时
+    C1-xC3: 心跳超时
+    C2->>C2: 检测到Leader故障
+    C3->>C3: 检测到Leader故障
+    
+    Note over C2,C3: Raft选举新Leader
+    C2->>C3: 发起投票请求
+    C3->>C2: 投票给C2
+    C2->>C2: 获得多数票，成为新Leader
+    
+    Note over C2,ML: 新Leader接管
+    C2->>ML: 读取最新元数据
+    ML-->>C2: 返回元数据
+    C2->>B: 广播新的Leader信息
+    B-->>C2: 确认更新
+    C3->>C2: 同步新Leader的元数据
+    
+    Note over C2,B: 恢复正常服务
+    C2->>ML: 继续写入元数据变更
+    C2->>B: 管理集群元数据
+    C3->>ML: 继续同步元数据
+                </div>
+            </div>
+            <div class="diagram-container" style="margin-top: 30px;">
+                <div class="mermaid">
+graph TD
+    Start[Controller Quorum运行] --> Leader[Controller Leader<br/>处理元数据请求]
+    Leader --> Write[写入Metadata Log]
+    Write --> Sync[Standby Controllers<br/>同步元数据]
+    Sync --> Monitor[监控Leader健康]
+    
+    Monitor --> Check{Leader是否存活?}
+    Check -->|是| Continue[继续运行]
+    Check -->|否| Detect[检测到Leader故障]
+    
+    Detect --> Elect[Raft选举机制]
+    Elect --> Vote[各Controller投票]
+    Vote --> Majority{获得多数票?}
+    
+    Majority -->|是| NewLeader[新Leader当选]
+    Majority -->|否| Retry[重新选举]
+    Retry --> Vote
+    
+    NewLeader --> ReadMeta[读取Metadata Log<br/>最新元数据]
+    ReadMeta --> Broadcast[广播新Leader信息<br/>给所有Broker]
+    Broadcast --> Update[Broker更新<br/>元数据缓存]
+    Update --> Service[恢复元数据服务]
+    
+    Continue --> Monitor
+    Service --> Write
+    
+    style Leader fill:#4caf50
+    style Detect fill:#f44336
+    style Elect fill:#ff9800
+    style NewLeader fill:#2196f3
+    style Service fill:#4caf50
+                </div>
+            </div>
+            <div class="description">
+                <h3>说明</h3>
+                <p><strong>KRaft模式的Controller选举和故障转移机制：</strong></p>
+                <ul>
+                    <li><strong>Raft共识算法</strong>：使用Raft算法在Controller Quorum中选举Leader，确保数据一致性</li>
+                    <li><strong>元数据存储</strong>：所有元数据变更都写入Metadata Log（内部Topic），保证持久化和可追溯</li>
+                    <li><strong>故障检测</strong>：通过心跳机制检测Leader故障，Follower Controllers会检测到Leader失联</li>
+                    <li><strong>自动选举</strong>：当Leader故障时，剩余Controllers通过Raft算法自动选举新Leader（需要获得多数票）</li>
+                    <li><strong>快速恢复</strong>：新Leader从Metadata Log读取最新元数据，广播给所有Broker，快速恢复服务</li>
+                    <li><strong>数据一致性</strong>：通过Raft算法保证元数据的一致性和顺序性，避免脑裂问题</li>
+                    <li><strong>优势对比Zookeeper</strong>：更快的故障恢复（秒级）、更简单的部署、更好的性能、支持更大规模集群</li>
+                </ul>
+                <p><strong>关键配置参数：</strong></p>
+                <ul>
+                    <li><code>process.roles=controller,broker</code>：节点角色（Controller、Broker或两者）</li>
+                    <li><code>controller.quorum.voters</code>：Controller Quorum的投票节点列表</li>
+                    <li><code>metadata.log.dir</code>：Metadata Log存储目录</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Raft算法详解 -->
+        <div class="diagram-section" id="raft-algorithm">
+            <h2>11. Raft算法详解及内部原理</h2>
+            
+            <div class="description">
+                <h3>Raft算法概述</h3>
+                <p>Raft是一种分布式一致性算法，用于在分布式系统中实现日志复制和Leader选举。Kafka KRaft模式使用Raft算法来管理Controller Quorum，确保元数据的一致性和高可用性。</p>
+            </div>
+
+            <!-- Raft核心概念 -->
+            <div class="diagram-section" style="margin-top: 30px; padding: 20px;">
+                <h3>Raft核心概念</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TB
+    subgraph "Raft节点状态"
+        Leader[Leader<br/>领导者<br/>处理所有客户端请求]
+        Follower[Follower<br/>跟随者<br/>被动接收日志]
+        Candidate[Candidate<br/>候选者<br/>选举过程中的临时状态]
+    end
+    
+    Leader -->|心跳超时| Candidate
+    Candidate -->|获得多数票| Leader
+    Candidate -->|发现已有Leader| Follower
+    Leader -->|失去领导权| Follower
+    Follower -->|选举超时| Candidate
+    
+    style Leader fill:#4caf50
+    style Follower fill:#2196f3
+    style Candidate fill:#ff9800
+                    </div>
+                </div>
+                <div class="description">
+                    <ul>
+                        <li><strong>Leader（领导者）</strong>：集群中只有一个Leader，处理所有客户端请求，负责日志复制</li>
+                        <li><strong>Follower（跟随者）</strong>：被动接收Leader的日志条目，响应Leader的心跳</li>
+                        <li><strong>Candidate（候选者）</strong>：选举过程中的临时状态，尝试成为Leader</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Raft选举过程 -->
+            <div class="diagram-container" style="margin-top: 30px;">
+                <h3>Raft Leader选举过程</h3>
+                <div class="mermaid">
+sequenceDiagram
+    participant F1 as Follower 1
+    participant F2 as Follower 2
+    participant F3 as Follower 3
+    participant F4 as Follower 4
+    participant F5 as Follower 5
+    
+    Note over F1,F5: 初始状态：所有节点都是Follower
+    Note over F1,F5: Leader心跳超时，触发选举
+    
+    F1->>F1: 选举超时，转为Candidate
+    F1->>F1: 增加任期号(Term)
+    F1->>F1: 投票给自己
+    F1->>F2: 发送RequestVote请求
+    F1->>F3: 发送RequestVote请求
+    F1->>F4: 发送RequestVote请求
+    F1->>F5: 发送RequestVote请求
+    
+    F2->>F1: 投票给F1
+    F3->>F1: 投票给F1
+    F4->>F1: 投票给F1
+    F5->>F1: 拒绝投票（已投票给其他节点）
+    
+    Note over F1: 获得3票（多数票：5/2+1=3）
+    F1->>F1: 成为Leader
+    
+    F1->>F2: 发送心跳(AppendEntries)
+    F1->>F3: 发送心跳(AppendEntries)
+    F1->>F4: 发送心跳(AppendEntries)
+    F1->>F5: 发送心跳(AppendEntries)
+    
+    F2->>F1: 确认心跳
+    F3->>F1: 确认心跳
+    F4->>F1: 确认心跳
+    F5->>F1: 确认心跳
+                </div>
+            </div>
+
+            <!-- Raft日志复制 -->
+            <div class="diagram-container" style="margin-top: 30px;">
+                <h3>Raft日志复制过程</h3>
+                <div class="mermaid">
+sequenceDiagram
+    participant Client as 客户端
+    participant L as Leader
+    participant F1 as Follower 1
+    participant F2 as Follower 2
+    participant F3 as Follower 3
+    participant F4 as Follower 4
+    
+    Client->>L: 提交日志条目
+    L->>L: 将日志追加到本地日志
+    L->>F1: AppendEntries(日志条目)
+    L->>F2: AppendEntries(日志条目)
+    L->>F3: AppendEntries(日志条目)
+    L->>F4: AppendEntries(日志条目)
+    
+    F1->>F1: 验证日志一致性
+    F2->>F2: 验证日志一致性
+    F3->>F3: 验证日志一致性
+    F4->>F4: 验证日志一致性
+    
+    F1->>L: 成功响应
+    F2->>L: 成功响应
+    F3->>L: 成功响应
+    F4->>L: 成功响应（延迟）
+    
+    Note over L: 收到多数节点确认（3/5）
+    L->>L: 提交日志条目
+    L->>Client: 返回成功
+    
+    L->>F1: 通知提交（下一次心跳）
+    L->>F2: 通知提交
+    L->>F3: 通知提交
+    L->>F4: 通知提交
+    
+    F1->>F1: 提交日志条目
+    F2->>F2: 提交日志条目
+    F3->>F3: 提交日志条目
+    F4->>F4: 提交日志条目（延迟提交）
+                </div>
+            </div>
+
+            <!-- Raft日志结构 -->
+            <div class="diagram-container" style="margin-top: 30px;">
+                <h3>Raft日志结构</h3>
+                <div class="mermaid">
+graph LR
+    subgraph "Leader日志"
+        L1[Index: 1<br/>Term: 1<br/>Cmd: x=1]
+        L2[Index: 2<br/>Term: 1<br/>Cmd: y=2]
+        L3[Index: 3<br/>Term: 2<br/>Cmd: z=3]
+        L4[Index: 4<br/>Term: 2<br/>Cmd: w=4]
+    end
+    
+    subgraph "Follower 1日志"
+        F1_1[Index: 1<br/>Term: 1<br/>Cmd: x=1]
+        F1_2[Index: 2<br/>Term: 1<br/>Cmd: y=2]
+        F1_3[Index: 3<br/>Term: 2<br/>Cmd: z=3]
+    end
+    
+    subgraph "Follower 2日志"
+        F2_1[Index: 1<br/>Term: 1<br/>Cmd: x=1]
+        F2_2[Index: 2<br/>Term: 1<br/>Cmd: y=2]
+        F2_3[Index: 3<br/>Term: 1<br/>Cmd: old_z]
+    end
+    
+    L1 -.->|匹配| F1_1
+    L2 -.->|匹配| F1_2
+    L3 -.->|匹配| F1_3
+    L4 -.->|未提交| F1_4[空]
+    
+    L1 -.->|匹配| F2_1
+    L2 -.->|匹配| F2_2
+    L3 -.->|冲突| F2_3
+    
+    Note1[Leader需要覆盖Follower 2的Index 3]
+    
+    style L4 fill:#ffeb3b
+    style F2_3 fill:#f44336
+                </div>
+            </div>
+
+            <!-- Raft安全性保证 -->
+            <div class="diagram-container" style="margin-top: 30px;">
+                <h3>Raft安全性保证机制</h3>
+                <div class="mermaid">
+graph TD
+    Start[Raft安全性保证] --> E1[选举安全性<br/>每个任期最多一个Leader]
+    Start --> E2[日志匹配性<br/>不同节点的日志在相同索引位置<br/>如果Term相同则内容相同]
+    Start --> E3[领导者完整性<br/>已提交的日志条目<br/>必须出现在新Leader的日志中]
+    Start --> E4[状态机安全性<br/>不同节点的状态机<br/>按相同顺序执行相同命令]
+    
+    E1 --> Rule1[投票规则：Candidate必须<br/>包含所有已提交的日志条目]
+    E2 --> Rule2[日志一致性检查：AppendEntries<br/>包含前一条日志的Term和Index]
+    E3 --> Rule3[选举限制：只有包含<br/>所有已提交日志的节点才能成为Leader]
+    E4 --> Rule4[提交规则：只有当前任期的<br/>日志条目才能被提交]
+    
+    style E1 fill:#4caf50
+    style E2 fill:#2196f3
+    style E3 fill:#ff9800
+    style E4 fill:#9c27b0
+                </div>
+            </div>
+
+            <div class="description" style="margin-top: 30px;">
+                <h3>Raft算法关键特性</h3>
+                <ul>
+                    <li><strong>强一致性</strong>：通过多数派投票确保数据一致性，避免脑裂</li>
+                    <li><strong>可理解性</strong>：算法设计清晰，易于理解和实现</li>
+                    <li><strong>Leader选举</strong>：使用随机超时机制避免选举冲突</li>
+                    <li><strong>日志复制</strong>：Leader负责日志复制，Follower被动接收</li>
+                    <li><strong>故障恢复</strong>：Leader故障时自动选举新Leader，快速恢复服务</li>
+                    <li><strong>日志压缩</strong>：支持快照机制，避免日志无限增长</li>
+                </ul>
+
+                <h3>Raft算法关键参数</h3>
+                <ul>
+                    <li><strong>Term（任期）</strong>：单调递增的整数，用于标识Leader的任期</li>
+                    <li><strong>CommitIndex</strong>：已提交的最大日志索引</li>
+                    <li><strong>LastApplied</strong>：已应用到状态机的最大日志索引</li>
+                    <li><strong>NextIndex</strong>：Leader为每个Follower维护的下一条要发送的日志索引</li>
+                    <li><strong>MatchIndex</strong>：Leader为每个Follower维护的已匹配的最大日志索引</li>
+                </ul>
+
+                <h3>Raft在Kafka KRaft中的应用</h3>
+                <ul>
+                    <li><strong>Controller选举</strong>：使用Raft算法在Controller Quorum中选举Leader</li>
+                    <li><strong>元数据管理</strong>：所有元数据变更通过Raft算法复制到所有Controller节点</li>
+                    <li><strong>Metadata Log</strong>：元数据存储在Kafka内部的特殊Topic，使用Raft算法保证一致性</li>
+                    <li><strong>故障转移</strong>：Controller Leader故障时，通过Raft算法快速选举新Leader</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Zookeeper算法详解 -->
+        <div class="diagram-section" id="zookeeper-algorithm">
+            <h2>12. Zookeeper算法详解及内部原理</h2>
+            
+            <div class="description">
+                <h3>Zookeeper概述</h3>
+                <p>Zookeeper是一个分布式协调服务，为分布式应用提供一致性服务。Kafka在3.3版本之前使用Zookeeper来管理集群元数据、Controller选举和配置信息。Zookeeper使用ZAB（Zookeeper Atomic Broadcast）协议来保证数据一致性。</p>
+            </div>
+
+            <!-- ZAB协议核心概念 -->
+            <div class="diagram-section" style="margin-top: 30px; padding: 20px;">
+                <h3>ZAB协议核心概念</h3>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TB
+    subgraph "Zookeeper节点状态"
+        Leading[Leading<br/>领导者<br/>处理所有写请求]
+        Following[Following<br/>跟随者<br/>接收Leader的写请求]
+        Observing[Observing<br/>观察者<br/>不参与投票，只同步数据]
+        Looking[Looking<br/>寻找Leader<br/>选举过程中的状态]
+    end
+    
+    Looking -->|选举成功| Leading
+    Looking -->|发现Leader| Following
+    Leading -->|失去领导权| Looking
+    Following -->|Leader故障| Looking
+    Observing -->|始终观察| Observing
+    
+    style Leading fill:#4caf50
+    style Following fill:#2196f3
+    style Looking fill:#ff9800
+    style Observing fill:#9e9e9e
+                    </div>
+                </div>
+                <div class="description">
+                    <ul>
+                        <li><strong>Leading（领导者）</strong>：集群中只有一个Leader，处理所有写请求，负责事务广播</li>
+                        <li><strong>Following（跟随者）</strong>：参与投票和选举，接收Leader的事务提案，参与事务提交</li>
+                        <li><strong>Observing（观察者）</strong>：不参与投票，只同步数据，提高读性能</li>
+                        <li><strong>Looking（寻找Leader）</strong>：选举过程中的状态，尝试选举或发现Leader</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ZAB选举过程 -->
+            <div class="diagram-container" style="margin-top: 30px;">
+                <h3>ZAB Leader选举过程（Fast Leader Election）</h3>
+                <div class="mermaid">
+sequenceDiagram
+    participant Z1 as Zookeeper 1<br/>(myid=1, zxid=100)
+    participant Z2 as Zookeeper 2<br/>(myid=2, zxid=100)
+    participant Z3 as Zookeeper 3<br/>(myid=3, zxid=99)
+    participant Z4 as Zookeeper 4<br/>(myid=4, zxid=100)
+    participant Z5 as Zookeeper 5<br/>(myid=5, zxid=100)
+    
+    Note over Z1,Z5: 初始状态：所有节点都是Looking状态
+    Note over Z1,Z5: Leader故障，触发选举
+    
+    Z1->>Z1: 投票给自己(1, 100, 1)
+    Z2->>Z2: 投票给自己(2, 100, 2)
+    Z3->>Z3: 投票给自己(3, 99, 3)
+    Z4->>Z4: 投票给自己(4, 100, 4)
+    Z5->>Z5: 投票给自己(5, 100, 5)
+    
+    Z1->>Z2: 发送投票(1, 100, 1)
+    Z1->>Z3: 发送投票(1, 100, 1)
+    Z1->>Z4: 发送投票(1, 100, 1)
+    Z1->>Z5: 发送投票(1, 100, 1)
+    
+    Z2->>Z1: 比较：zxid相同(100)，myid更大(2>1)，拒绝
+    Z3->>Z1: 比较：zxid更小(99<100)，拒绝
+    Z4->>Z1: 比较：zxid相同(100)，myid更大(4>1)，拒绝
+    Z5->>Z1: 比较：zxid相同(100)，myid更大(5>1)，拒绝
+    
+    Z4->>Z1: 发送投票(4, 100, 4)
+    Z4->>Z2: 发送投票(4, 100, 4)
+    Z4->>Z3: 发送投票(4, 100, 4)
+    Z4->>Z5: 发送投票(4, 100, 4)
+    
+    Z1->>Z4: 接受投票（zxid相同，myid更大）
+    Z2->>Z4: 接受投票（zxid相同，myid更大）
+    Z3->>Z4: 接受投票（zxid更大）
+    Z5->>Z4: 接受投票（zxid相同，myid更大）
+    
+    Note over Z4: 获得多数票（4/5），成为Leader
+    Z4->>Z4: 转为Leading状态
+    
+    Z4->>Z1: 发送NEWLEADER消息
+    Z4->>Z2: 发送NEWLEADER消息
+    Z4->>Z3: 发送NEWLEADER消息
+    Z4->>Z5: 发送NEWLEADER消息
+    
+    Z1->>Z4: 确认NEWLEADER
+    Z2->>Z4: 确认NEWLEADER
+    Z3->>Z4: 确认NEWLEADER
+    Z5->>Z4: 确认NEWLEADER
+    
+    Note over Z4: 收到多数确认，开始服务
+                </div>
+            </div>
+
+            <!-- ZAB事务广播 -->
+            <div class="diagram-container" style="margin-top: 30px;">
+                <h3>ZAB事务广播过程（Atomic Broadcast）</h3>
+                <div class="mermaid">
+sequenceDiagram
+    participant Client as 客户端
+    participant L as Leader
+    participant F1 as Follower 1
+    participant F2 as Follower 2
+    participant F3 as Follower 3
+    participant F4 as Follower 4
+    
+    Client->>L: 提交写请求
+    L->>L: 生成事务提案(Proposal)<br/>分配zxid
+    L->>L: 将提案写入事务日志
+    L->>F1: 发送PROPOSAL(事务提案)
+    L->>F2: 发送PROPOSAL(事务提案)
+    L->>F3: 发送PROPOSAL(事务提案)
+    L->>F4: 发送PROPOSAL(事务提案)
+    
+    F1->>F1: 验证提案，写入事务日志
+    F2->>F2: 验证提案，写入事务日志
+    F3->>F3: 验证提案，写入事务日志
+    F4->>F4: 验证提案，写入事务日志
+    
+    F1->>L: ACK确认
+    F2->>L: ACK确认
+    F3->>L: ACK确认
+    F4->>L: ACK确认（延迟）
+    
+    Note over L: 收到多数ACK（3/5）
+    L->>L: 提交事务(COMMIT)
+    L->>L: 应用到内存数据库
+    L->>Client: 返回成功
+    
+    L->>F1: 发送COMMIT消息
+    L->>F2: 发送COMMIT消息
+    L->>F3: 发送COMMIT消息
+    L->>F4: 发送COMMIT消息
+    
+    F1->>F1: 提交事务，应用到内存数据库
+    F2->>F2: 提交事务，应用到内存数据库
+    F3->>F3: 提交事务，应用到内存数据库
+    F4->>F4: 提交事务，应用到内存数据库（延迟提交）
+                </div>
+            </div>
+
+            <!-- ZAB数据模型 -->
+            <div class="diagram-container" style="margin-top: 30px;">
+                <h3>Zookeeper数据模型</h3>
+                <div class="mermaid">
+graph TD
+    Root[/] --> App1[/app1]
+    Root --> App2[/app2]
+    Root --> Kafka[/kafka]
+    
+    App1 --> Node1[/app1/node1<br/>data: value1<br/>version: 1]
+    App1 --> Node2[/app1/node2<br/>data: value2<br/>version: 1]
+    
+    Kafka --> Brokers[/kafka/brokers<br/>临时节点]
+    Kafka --> Controller[/kafka/controller<br/>临时节点]
+    Kafka --> Config[/kafka/config<br/>持久节点]
+    
+    Brokers --> B1[/kafka/brokers/1<br/>临时节点<br/>Broker 1信息]
+    Brokers --> B2[/kafka/brokers/2<br/>临时节点<br/>Broker 2信息]
+    Brokers --> B3[/kafka/brokers/3<br/>临时节点<br/>Broker 3信息]
+    
+    Controller --> ControllerData[controller_epoch: 1<br/>controller_id: 2<br/>timestamp: ...]
+    
+    style Root fill:#4caf50
+    style Kafka fill:#ff9800
+    style Brokers fill:#2196f3
+    style Controller fill:#f44336
+                </div>
+            </div>
+
+            <!-- ZAB恢复模式 -->
+            <div class="diagram-container" style="margin-top: 30px;">
+                <h3>ZAB协议两种模式</h3>
+                <div class="mermaid">
+graph TD
+    Start[ZAB协议] --> Mode1[崩溃恢复模式<br/>Recovery Mode]
+    Start --> Mode2[消息广播模式<br/>Broadcast Mode]
+    
+    Mode1 --> E1[Leader选举]
+    E1 --> E2[数据同步]
+    E2 --> E3[发现大多数Follower<br/>已同步完成]
+    E3 --> Mode2
+    
+    Mode2 --> B1[接收客户端请求]
+    B1 --> B2[生成事务提案]
+    B2 --> B3[广播提案给Follower]
+    B3 --> B4[收集ACK确认]
+    B4 --> B5{收到多数ACK?}
+    B5 -->|是| B6[提交事务]
+    B5 -->|否| B7[等待更多ACK]
+    B7 --> B5
+    B6 --> B8[通知Follower提交]
+    B8 --> B1
+    
+    B6 --> Check{Leader故障?}
+    Check -->|是| Mode1
+    Check -->|否| B1
+    
+    style Mode1 fill:#ff9800
+    style Mode2 fill:#4caf50
+                </div>
+            </div>
+
+            <!-- ZAB与Raft对比 -->
+            <div class="diagram-container" style="margin-top: 30px;">
+                <h3>ZAB协议与Raft算法对比</h3>
+                <div class="mermaid">
+graph LR
+    subgraph "ZAB协议"
+        Z1[事务日志<br/>Transaction Log]
+        Z2[ZXID<br/>事务ID]
+        Z3[两阶段提交<br/>Proposal + Commit]
+        Z4[Fast Leader Election]
+    end
+    
+    subgraph "Raft算法"
+        R1[日志条目<br/>Log Entries]
+        R2[Term + Index<br/>任期+索引]
+        R3[日志复制<br/>AppendEntries]
+        R4[Leader Election]
+    end
+    
+    Z1 -.->|相似| R1
+    Z2 -.->|不同| R2
+    Z3 -.->|相似| R3
+    Z4 -.->|不同| R4
+    
+    style ZAB fill:#ff9800
+    style Raft fill:#4caf50
+                </div>
+            </div>
+
+            <div class="description" style="margin-top: 30px;">
+                <h3>ZAB协议关键特性</h3>
+                <ul>
+                    <li><strong>事务顺序性</strong>：所有事务按ZXID顺序执行，保证全局顺序</li>
+                    <li><strong>原子性广播</strong>：使用两阶段提交（Proposal + Commit）保证事务原子性</li>
+                    <li><strong>快速Leader选举</strong>：使用Fast Leader Election算法，快速选举新Leader</li>
+                    <li><strong>数据一致性</strong>：通过多数派投票和事务日志保证数据一致性</li>
+                    <li><strong>崩溃恢复</strong>：Leader故障时，新Leader通过事务日志恢复数据</li>
+                    <li><strong>观察者模式</strong>：支持Observer节点，提高读性能但不参与投票</li>
+                </ul>
+
+                <h3>ZAB协议关键概念</h3>
+                <ul>
+                    <li><strong>ZXID（Zookeeper Transaction ID）</strong>：64位整数，高32位是epoch，低32位是计数器</li>
+                    <li><strong>Epoch</strong>：Leader的任期编号，每次选举Leader时递增</li>
+                    <li><strong>事务日志</strong>：所有写操作都记录到事务日志，用于恢复和复制</li>
+                    <li><strong>快照（Snapshot）</strong>：定期生成数据快照，用于快速恢复</li>
+                    <li><strong>会话（Session）</strong>：客户端与Zookeeper服务器的连接会话，有超时机制</li>
+                </ul>
+
+                <h3>Zookeeper在Kafka中的应用</h3>
+                <ul>
+                    <li><strong>Broker注册</strong>：Broker启动时在Zookeeper中注册临时节点</li>
+                    <li><strong>Controller选举</strong>：通过竞争创建临时节点选举Controller</li>
+                    <li><strong>Topic配置</strong>：Topic的配置信息存储在Zookeeper中</li>
+                    <li><strong>分区分配</strong>：Partition的Leader和ISR信息存储在Zookeeper中</li>
+                    <li><strong>Consumer Group</strong>：Consumer Group的Offset和成员信息存储在Zookeeper中（旧版本）</li>
+                </ul>
+
+                <h3>Zookeeper与KRaft的对比</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <tr style="background: #f5f5f5;">
+                        <th style="border: 1px solid #ddd; padding: 8px;">特性</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Zookeeper</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">KRaft</th>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">依赖</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">需要独立的Zookeeper集群</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">无需外部依赖，内置Raft</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">故障恢复</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">秒级到分钟级</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">秒级</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">扩展性</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">受Zookeeper限制</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">支持更大规模集群</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">性能</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">元数据操作有网络延迟</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">更低的延迟，更高的吞吐量</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">部署</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">需要单独部署和维护</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">简化部署，统一管理</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- 关键概念说明 -->
+        <div class="diagram-section">
+            <h2>📚 关键概念说明</h2>
+            <div class="description">
+                <h3>Producer (生产者)</h3>
+                <ul>
+                    <li>负责向Kafka发送消息</li>
+                    <li>支持同步和异步发送</li>
+                    <li>可配置确认机制(<code>acks: 0/1/all</code>)</li>
+                    <li>支持消息分区策略</li>
+                </ul>
+
+                <h3>Consumer (消费者)</h3>
+                <ul>
+                    <li>从Kafka拉取并处理消息</li>
+                    <li>属于Consumer Group，实现负载均衡</li>
+                    <li>维护消费偏移量(Offset)</li>
+                    <li>支持自动和手动提交Offset</li>
+                </ul>
+
+                <h3>Broker (代理服务器)</h3>
+                <ul>
+                    <li>Kafka集群中的节点</li>
+                    <li>存储消息到本地磁盘</li>
+                    <li>处理Producer和Consumer的请求</li>
+                    <li>负责副本复制和Leader选举</li>
+                </ul>
+
+                <h3>Topic (主题)</h3>
+                <ul>
+                    <li>消息的逻辑分类</li>
+                    <li>可以包含多个Partition</li>
+                    <li>支持多副本以提高可用性</li>
+                </ul>
+
+                <h3>Partition (分区)</h3>
+                <ul>
+                    <li>Topic的物理分割</li>
+                    <li>每个Partition有序存储</li>
+                    <li>支持水平扩展和并行处理</li>
+                </ul>
+
+                <h3>Consumer Group (消费组)</h3>
+                <ul>
+                    <li>多个Consumer的集合</li>
+                    <li>实现消息的负载均衡</li>
+                    <li>每个Partition只能被Group中的一个Consumer消费</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 配置要点 -->
+        <div class="diagram-section">
+            <h2>⚙️ 配置要点</h2>
+            <div class="description">
+                <h3>Producer配置</h3>
+                <ul>
+                    <li><code>bootstrap.servers</code>: Kafka集群地址</li>
+                    <li><code>acks</code>: 消息确认机制</li>
+                    <li><code>retries</code>: 重试次数</li>
+                    <li><code>batch.size</code>: 批次大小</li>
+                    <li><code>linger.ms</code>: 等待时间</li>
+                </ul>
+
+                <h3>Consumer配置</h3>
+                <ul>
+                    <li><code>group.id</code>: 消费组ID</li>
+                    <li><code>auto.offset.reset</code>: Offset重置策略</li>
+                    <li><code>enable.auto.commit</code>: 是否自动提交Offset</li>
+                    <li><code>fetch.min.bytes</code>: 最小拉取字节数</li>
+                    <li><code>max.partition.fetch.bytes</code>: 单分区最大拉取字节数</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化 Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                diagramMarginX: 50,
+                diagramMarginY: 10,
+                actorMargin: 50,
+                width: 150,
+                height: 65,
+                boxMargin: 10,
+                boxTextMargin: 5,
+                noteMargin: 10,
+                messageMargin: 35
+            }
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
