@@ -36,6 +36,8 @@ public abstract class NativeDetector {
 	 * Returns {@code true} if running in a native image context (for example
 	 * {@code buildtime}, {@code runtime}, or {@code agent}) expressed by setting the
 	 * {@code org.graalvm.nativeimage.imagecode} system property to any value.
+	 * 如果在本机映像上下文（例如{@code buildtime}， {@code runtime}或{@code agent}）中运行，则返回{@code true}，
+	 * 通过设置{@code org.graalvm.nativeimage表示。Imagecode} system属性设置为任意值。
 	 */
 	public static boolean inNativeImage() {
 		return inNativeImage;

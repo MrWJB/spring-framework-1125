@@ -36,6 +36,7 @@ import org.springframework.util.Assert;
  * provided that a default {@code LoadTimeWeaver} is actually available.
  *
  * <p>Applications should not use this class directly.
+ * 应用程序不应该直接使用这个类。
  *
  * @author Juergen Hoeller
  * @since 2.5

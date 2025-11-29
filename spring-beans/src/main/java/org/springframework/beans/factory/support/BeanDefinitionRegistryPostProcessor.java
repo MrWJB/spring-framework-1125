@@ -26,6 +26,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
  * BeanFactoryPostProcessor detection kicks in. In particular,
  * BeanDefinitionRegistryPostProcessor may register further bean definitions
  * which in turn define BeanFactoryPostProcessor instances.
+ * <p>扩展了标准{@link BeanFactoryPostProcessor} SPI，允许在常规{@code BeanFactoryPostProcessor}检测开始之前注册进一步的bean定义。
+ * 特别是，{@code BeanDefinitionRegistryPostProcessor}可以注册进一步的bean定义，这些定义反过来定义{@code BeanFactoryPostProcessor}实例。
  *
  * @author Juergen Hoeller
  * @since 3.0.1
@@ -38,6 +40,8 @@ public interface BeanDefinitionRegistryPostProcessor extends BeanFactoryPostProc
 	 * standard initialization. All regular bean definitions will have been loaded,
 	 * but no beans will have been instantiated yet. This allows for adding further
 	 * bean definitions before the next post-processing phase kicks in.
+	 * 在标准初始化之后修改应用程序上下文的内部bean定义注册中心。将加载所有常规bean定义，但还没有实例化任何bean。这允许在下一个后处理阶段开始之前添加进一步的bean定义。
+	 *
 	 * @param registry the bean definition registry used by the application context
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 */
@@ -47,6 +51,7 @@ public interface BeanDefinitionRegistryPostProcessor extends BeanFactoryPostProc
 	 * Empty implementation of {@link BeanFactoryPostProcessor#postProcessBeanFactory}
 	 * since custom {@code BeanDefinitionRegistryPostProcessor} implementations will
 	 * typically only provide a {@link #postProcessBeanDefinitionRegistry} method.
+	 * <p>空的实现{@link BeanFactoryPostProcessor#postProcessBeanFactory}，因为自定义的{@code BeanDefinitionRegistryPostProcessor}实现通常只提供一个{@link #postProcessBeanDefinitionRegistry}方法。
 	 * @since 6.1
 	 */
 	@Override
