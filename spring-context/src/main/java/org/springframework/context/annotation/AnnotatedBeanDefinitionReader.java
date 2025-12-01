@@ -128,13 +128,17 @@ public class AnnotatedBeanDefinitionReader {
 
 	/**
 	 * Register one or more component classes to be processed.
+	 * 注册一个或多个组件类，这些类将被处理。
 	 * <p>Calls to {@code register} are idempotent; adding the same
 	 * component class more than once has no additional effect.
+	 * 调用register是幂等的；添加相同的组件类多次没有额外的效果。
 	 * @param componentClasses one or more component classes,
 	 * for example, {@link Configuration @Configuration} classes
 	 */
 	public void register(Class<?>... componentClasses) {
+		// 注册多个组件类
 		for (Class<?> componentClass : componentClasses) {
+			// 注册一个组件类
 			registerBean(componentClass);
 		}
 	}
@@ -142,9 +146,11 @@ public class AnnotatedBeanDefinitionReader {
 	/**
 	 * Register a bean from the given bean class, deriving its metadata from
 	 * class-declared annotations.
+	 * 从给定的bean类注册一个bean，从类声明的注解派生它的元数据。
 	 * @param beanClass the class of the bean
 	 */
 	public void registerBean(Class<?> beanClass) {
+		// 注册一个bean
 		doRegisterBean(beanClass, null, null, null, null);
 	}
 
@@ -237,6 +243,7 @@ public class AnnotatedBeanDefinitionReader {
 	/**
 	 * Register a bean from the given bean class, deriving its metadata from
 	 * class-declared annotations.
+	 * 从给定的bean类注册一个bean，从类声明的注解派生它的元数据。
 	 * @param beanClass the class of the bean
 	 * @param name an explicit name for the bean
 	 * @param qualifiers specific qualifier annotations to consider, if any,
@@ -251,6 +258,7 @@ public class AnnotatedBeanDefinitionReader {
 			Class<? extends Annotation> @Nullable [] qualifiers, @Nullable Supplier<T> supplier,
 			BeanDefinitionCustomizer @Nullable [] customizers) {
 
+		// 构建BeanDefinition
 		AnnotatedGenericBeanDefinition abd = new AnnotatedGenericBeanDefinition(beanClass);
 		if (this.conditionEvaluator.shouldSkip(abd.getMetadata())) {
 			return;
@@ -287,6 +295,7 @@ public class AnnotatedBeanDefinitionReader {
 
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(abd, beanName);
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+		// 注册Bean定义
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}
 

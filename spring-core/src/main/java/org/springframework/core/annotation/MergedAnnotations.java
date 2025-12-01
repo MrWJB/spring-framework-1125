@@ -175,6 +175,7 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 
 	/**
 	 * Determine if the specified annotation type is directly present.
+	 * 确定指定的注解类型是否直接存在。
 	 * <p>Equivalent to calling {@code get(annotationType).isDirectlyPresent()}.
 	 * @param annotationType the fully qualified class name of the annotation type
 	 * to check
@@ -328,10 +329,12 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 	 * Create a new {@link MergedAnnotations} instance containing all
 	 * annotations and meta-annotations from the specified element and,
 	 * depending on the {@link SearchStrategy}, related inherited elements.
+	 * 创建一个新的{@link MergedAnnotations}实例，其中包含来自指定元素的所有注解和元注解，以及相关的继承元素（取决于{@link SearchStrategy}）。
+	 *
 	 * @param element the source element
 	 * @param searchStrategy the search strategy to use
 	 * @param repeatableContainers the repeatable containers that may be used by
-	 * the element annotations or the meta-annotations
+	 * the element annotations or the meta-annotations 元素注解或元注解可能使用的可重复容器
 	 * @return a {@code MergedAnnotations} instance containing the merged
 	 * element annotations
 	 * @see #search(SearchStrategy)
@@ -346,6 +349,8 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 	 * Create a new {@link MergedAnnotations} instance containing all
 	 * annotations and meta-annotations from the specified element and,
 	 * depending on the {@link SearchStrategy}, related inherited elements.
+	 * 创建一个新的{@link MergedAnnotations}实例，其中包含来自指定元素的所有注解和元注解，以及相关的继承元素（取决于{@link SearchStrategy}）。
+	 *
 	 * @param element the source element
 	 * @param searchStrategy the search strategy to use
 	 * @param repeatableContainers the repeatable containers that may be used by
@@ -643,6 +648,8 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 		/**
 		 * Find all directly declared annotations as well as any
 		 * {@link Inherited @Inherited} superclass annotations.
+		 * 查找所有直接声明的注解以及任何{@link Inherited @Inherited}超类注解。
+		 *
 		 * <p>This strategy is only really useful when used with {@link Class}
 		 * types since the {@link Inherited @Inherited} annotation is ignored for
 		 * all other {@linkplain AnnotatedElement annotated elements}.

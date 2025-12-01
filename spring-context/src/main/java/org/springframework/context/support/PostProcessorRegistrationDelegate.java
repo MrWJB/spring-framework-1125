@@ -53,7 +53,6 @@ import org.springframework.core.metrics.StartupStep;
 
 /**
  * Delegate for AbstractApplicationContext's post-processor handling.
- * AbstractApplicationContext后处理器处理的委托类。
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -82,9 +81,6 @@ final class PostProcessorRegistrationDelegate {
 		// Before submitting a pull request (PR) to change this method, please review the
 		// list of all declined PRs involving changes to PostProcessorRegistrationDelegate
 		// to ensure that your proposal does not result in a breaking change:
-		// https://github.com/spring-projects/spring-framework/issues?q=PostProcessorRegistrationDelegate+is%3Aclosed+label%3A%22status%3A+declined%22
-		// 在提交修改此方法的PR之前，请查看所有被拒绝的PostProcessorRegistrationDelegate相关PR，
-		// 确保你的提议不会引入破坏性变更：
 		// https://github.com/spring-projects/spring-framework/issues?q=PostProcessorRegistrationDelegate+is%3Aclosed+label%3A%22status%3A+declined%22
 
 		// Invoke BeanDefinitionRegistryPostProcessors first, if any.
@@ -303,9 +299,7 @@ final class PostProcessorRegistrationDelegate {
 
 		// 警告：虽然看起来可以很容易地重构此方法的主体以避免使用多个循环和多个列表，但使用多个列表和多次传递处理器名称是有意的。
 		// 我们必须确保我们遵守了PriorityOrdered和Ordered处理器的合同。具体来说，我们一定不能导致处理器被实例化（通过getBean（）调用）或以错误的顺序在ApplicationContext中注册。
-		// 在提交拉取请求（PR）以更改此方法之前，请查看所有涉及更改PostProcessorRegistrationDelegate的被拒绝PR，
-		// 确保提议不会带来破坏性变更：
-		// https://github.com/spring-projects/spring-framework/issues?q=PostProcessorRegistrationDelegate+is%3Aclosed+label%3A%22status%3A+declined%22
+		// 在提交拉取请求（PR）以更改此方法之前，请查看所有涉及更改PostProcessorRegistrationDelegate的被拒绝的PR列表，以确保您的提议不会导致破坏性更改：
 
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
@@ -408,15 +402,10 @@ final class PostProcessorRegistrationDelegate {
 
 	/**
 	 * Load and sort the post-processors of the specified type.
-	 * 加载并排序指定类型的后处理器。
 	 * @param beanFactory the bean factory to use
-	 * @param beanFactory 要使用的BeanFactory
 	 * @param beanPostProcessorType the post-processor type
-	 * @param beanPostProcessorType 后处理器类型
 	 * @param <T> the post-processor type
-	 * @param <T> 后处理器类型
 	 * @return a list of sorted post-processors for the specified type
-	 * @return 指定类型的已排序后处理器列表
 	 */
 	static <T extends BeanPostProcessor> List<T> loadBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, Class<T> beanPostProcessorType) {
@@ -436,10 +425,7 @@ final class PostProcessorRegistrationDelegate {
 	 * registered in the specified bean factory, resolving bean definitions and
 	 * any attributes if necessary as well as any inner bean definitions that
 	 * they may contain.
-	 * 有选择性地调用指定BeanFactory中注册的{@link MergedBeanDefinitionPostProcessor}，
-	 * 按需解析Bean定义、属性以及可能包含的内部Bean定义。
 	 * @param beanFactory the bean factory to use
-	 * @param beanFactory 要使用的BeanFactory
 	 */
 	static void invokeMergedBeanDefinitionPostProcessors(DefaultListableBeanFactory beanFactory) {
 		new MergedBeanDefinitionPostProcessorInvoker(beanFactory).invokeMergedBeanDefinitionPostProcessors();
@@ -447,7 +433,6 @@ final class PostProcessorRegistrationDelegate {
 
 	private static void sortPostProcessors(List<?> postProcessors, ConfigurableListableBeanFactory beanFactory) {
 		// Nothing to sort?
-		// 无需排序？
 		if (postProcessors.size() <= 1) {
 			return;
 		}
@@ -482,7 +467,7 @@ final class PostProcessorRegistrationDelegate {
 
 	/**
 	 * Invoke the given BeanFactoryPostProcessor beans.
-	 * 调用给定的BeanFactoryPostProcessor。
+	 * 
 	 */
 	private static void invokeBeanFactoryPostProcessors(
 			Collection<? extends BeanFactoryPostProcessor> postProcessors, ConfigurableListableBeanFactory beanFactory) {
@@ -497,14 +482,12 @@ final class PostProcessorRegistrationDelegate {
 
 	/**
 	 * Register the given BeanPostProcessor beans.
-	 * 注册给定的BeanPostProcessor。
 	 */
 	private static void registerBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<? extends BeanPostProcessor> postProcessors) {
 
 		if (beanFactory instanceof AbstractBeanFactory abstractBeanFactory) {
 			// Bulk addition is more efficient against our CopyOnWriteArrayList there
-			// 针对内部的CopyOnWriteArrayList，批量添加更高效
 			abstractBeanFactory.addBeanPostProcessors(postProcessors);
 		}
 		else {
@@ -519,8 +502,6 @@ final class PostProcessorRegistrationDelegate {
 	 * BeanPostProcessor that logs a warn message when a bean is created during
 	 * BeanPostProcessor instantiation, i.e. when a bean is not eligible for
 	 * getting processed by all BeanPostProcessors.
-	 * BeanPostProcessorChecker在BeanPostProcessor实例化期间发现有Bean被创建时记录告警，
-	 * 表示该Bean无法被所有BeanPostProcessor处理。
 	 */
 	private static final class BeanPostProcessorChecker implements BeanPostProcessor {
 
@@ -668,7 +649,6 @@ final class PostProcessorRegistrationDelegate {
 				}
 				catch (ClassNotFoundException ex) {
 					// ignore
-					// 忽略处理
 				}
 			}
 			return bd.getResolvableType().toClass();

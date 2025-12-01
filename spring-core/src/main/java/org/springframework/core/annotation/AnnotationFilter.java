@@ -38,7 +38,10 @@ public interface AnnotationFilter {
 	 * {@link AnnotationFilter} that matches annotations in the
 	 * {@code java.lang} and {@code org.springframework.lang} packages
 	 * and their subpackages.
+	 * {@link AnnotationFilter}匹配{@code java.Lang}和{@code org.springframework.Lang}包及其子包。
+	 *
 	 * <p>This is the default filter in the {@link MergedAnnotations} model.
+	 * 这是{@link MergedAnnotations}模型中的默认过滤器。
 	 */
 	AnnotationFilter PLAIN = packages("java.lang", "org.springframework.lang");
 

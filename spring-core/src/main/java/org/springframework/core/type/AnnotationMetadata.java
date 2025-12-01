@@ -27,7 +27,7 @@ import org.springframework.core.annotation.MergedAnnotations;
 /**
  * Interface that defines abstract access to the annotations of a specific
  * class, in a form that does not require that class to be loaded yet.
- *
+ * 定义了对特定类的注解的抽象访问，而无需加载该类。
  * @author Juergen Hoeller
  * @author Mark Fisher
  * @author Phillip Webb
@@ -42,6 +42,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	/**
 	 * Get the fully-qualified class names of all annotation types that are
 	 * <em>directly present</em> on the underlying class.
+	 * 获得底层类的直接存在的注解类型名称
 	 * @return the annotation type names
 	 */
 	default Set<String> getAnnotationTypes() {
@@ -54,6 +55,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	/**
 	 * Get the fully-qualified class names of all meta-annotation types that are
 	 * <em>present</em> on the given annotation type on the underlying class.
+	 * 获得底层类的给定注解类型的所有元注解类型名称
 	 * @param annotationName the fully-qualified class name of the annotation
 	 * type to look for meta-annotations on
 	 * @return the meta-annotation type names, or an empty set if none found
@@ -71,6 +73,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	/**
 	 * Determine whether an annotation of the given type is <em>directly present</em>
 	 * on the underlying class.
+	 * 决定底层类是否具有直接存在的给定类型的注解
 	 * @param annotationName the fully-qualified class name of the annotation
 	 * type to look for
 	 * @return {@code true} if a matching annotation is directly present
@@ -82,6 +85,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	/**
 	 * Determine whether the underlying class has an annotation that is itself
 	 * annotated with the meta-annotation of the given type.
+	 * 决定底层类是否具有带有给定元注解类型的注解
 	 * @param metaAnnotationName the fully-qualified class name of the
 	 * meta-annotation type to look for
 	 * @return {@code true} if a matching meta-annotation is present
@@ -94,6 +98,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	/**
 	 * Determine whether the underlying class has any methods that are
 	 * annotated (or meta-annotated) with the given annotation type.
+	 * 决定底层类是否具有带有给定注解类型的任何方法（或元注解）
 	 * @param annotationName the fully-qualified class name of the annotation
 	 * type to look for
 	 */
@@ -104,6 +109,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	/**
 	 * Retrieve the method metadata for all methods that are annotated
 	 * (or meta-annotated) with the given annotation type.
+	 * 接收所有方法元数据，这些方法已被注解（或元注解）
 	 * <p>For any returned method, {@link MethodMetadata#isAnnotated} will
 	 * return {@code true} for the given annotation type.
 	 * @param annotationName the fully-qualified class name of the annotation
@@ -117,6 +123,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	/**
 	 * Retrieve the method metadata for all user-declared methods on the
 	 * underlying class, preserving declaration order as far as possible.
+	 * 接收底层类的所有用户声明的方法元数据，尽可能保留声明顺序。
 	 * @return a set of {@link MethodMetadata}
 	 * @since 6.0
 	 */
@@ -126,6 +133,8 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	/**
 	 * Factory method to create a new {@link AnnotationMetadata} instance
 	 * for the given class using standard reflection.
+	 * 工厂方法，用于创建AnnotationMetadata实例，使用标准反射
+	 *
 	 * @param type the class to introspect
 	 * @return a new {@link AnnotationMetadata} instance
 	 * @since 5.2
