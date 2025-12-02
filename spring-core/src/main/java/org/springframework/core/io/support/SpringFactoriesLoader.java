@@ -193,11 +193,14 @@ public class SpringFactoriesLoader {
 			@Nullable FailureHandler failureHandler) {
 
 		Assert.notNull(factoryType, "'factoryType' must not be null");
+
+		//
 		List<String> implementationNames = loadFactoryNames(factoryType);
 		logger.trace(LogMessage.format("Loaded [%s] names: %s", factoryType.getName(), implementationNames));
 		List<T> result = new ArrayList<>(implementationNames.size());
 		FailureHandler failureHandlerToUse = (failureHandler != null) ? failureHandler : THROWING_FAILURE_HANDLER;
 		for (String implementationName : implementationNames) {
+			// 实例化工厂实现类
 			T factory = instantiateFactory(implementationName, factoryType, argumentResolver, failureHandlerToUse);
 			if (factory != null) {
 				result.add(factory);
@@ -215,10 +218,14 @@ public class SpringFactoriesLoader {
 			@Nullable ArgumentResolver argumentResolver, FailureHandler failureHandler) {
 
 		try {
+			// 类加载
 			Class<?> factoryImplementationClass = ClassUtils.forName(implementationName, this.classLoader);
+			// 断言
 			Assert.isTrue(type.isAssignableFrom(factoryImplementationClass), () ->
 					"Class [%s] is not assignable to factory type [%s]".formatted(implementationName, type.getName()));
+			// 实例化器
 			FactoryInstantiator<T> factoryInstantiator = FactoryInstantiator.forClass(factoryImplementationClass);
+			// 实例化工厂实现类
 			return factoryInstantiator.instantiate(argumentResolver);
 		}
 		catch (Throwable ex) {
@@ -281,6 +288,7 @@ public class SpringFactoriesLoader {
 	 * Create a {@link SpringFactoriesLoader} instance that will load and
 	 * instantiate the factory implementations from
 	 * {@value #FACTORIES_RESOURCE_LOCATION}, using the given class loader.
+	 * 创建一个{@link SpringFactoriesLoader}实例，它将使用给定的类加载器从{@value FACTORIES_RESOURCE_LOCATION}加载并实例化工厂实现。
 	 * @param classLoader the ClassLoader to use for loading resources; can be
 	 * {@code null} to use the default
 	 * @return a {@link SpringFactoriesLoader} instance
@@ -308,6 +316,7 @@ public class SpringFactoriesLoader {
 	 * Create a {@link SpringFactoriesLoader} instance that will load and
 	 * instantiate the factory implementations from the given location,
 	 * using the given class loader.
+	 * 创建一个{@link springfactoresloader}实例，它将使用给定的类加载器从给定位置加载并实例化工厂实现。
 	 * @param resourceLocation the resource location to look for factories
 	 * @param classLoader the ClassLoader to use for loading resources;
 	 * can be {@code null} to use the default
@@ -317,29 +326,41 @@ public class SpringFactoriesLoader {
 	 */
 	public static SpringFactoriesLoader forResourceLocation(String resourceLocation, @Nullable ClassLoader classLoader) {
 		Assert.hasText(resourceLocation, "'resourceLocation' must not be empty");
+		// 获取类加载器
 		ClassLoader resourceClassLoader = (classLoader != null ? classLoader :
 				SpringFactoriesLoader.class.getClassLoader());
+		// 初始化factoriesCache
 		Map<String, Factories> factoriesCache = cache.computeIfAbsent(
 				resourceClassLoader, key -> new ConcurrentReferenceHashMap<>());
+
+		// 将加载的resourceLocation下的factories缓存起来
 		Factories factories = factoriesCache.computeIfAbsent(resourceLocation, key ->
 				new Factories(loadFactoriesResource(resourceClassLoader, resourceLocation)));
+
+		// 实例化SpringFactoriesLoader对象
 		return new SpringFactoriesLoader(classLoader, factories.byType());
 	}
 
 	protected static Map<String, List<String>> loadFactoriesResource(ClassLoader classLoader, String resourceLocation) {
 		Map<String, List<String>> result = new LinkedHashMap<>();
 		try {
+			// 加载资源
 			Enumeration<URL> urls = classLoader.getResources(resourceLocation);
 			while (urls.hasMoreElements()) {
 				UrlResource resource = new UrlResource(urls.nextElement());
+				// 加载properties文件
 				Properties properties = PropertiesLoaderUtils.loadProperties(resource);
 				properties.forEach((name, value) -> {
+					// 将字符串转换为数组
 					String[] factoryImplementationNames = StringUtils.commaDelimitedListToStringArray((String) value);
+					// 筛选指定名称的字符串到集合中（factories配置文件中指定字符串key的value）
 					List<String> implementations = result.computeIfAbsent(((String) name).trim(),
 							key -> new ArrayList<>(factoryImplementationNames.length));
+					// 将实现类名称添加到集合中
 					Arrays.stream(factoryImplementationNames).map(String::trim).forEach(implementations::add);
 				});
 			}
+			// 数据去重
 			result.replaceAll(SpringFactoriesLoader::toDistinctUnmodifiableList);
 		}
 		catch (IOException ex) {
@@ -355,6 +376,7 @@ public class SpringFactoriesLoader {
 
 	/**
 	 * Internal instantiator used to create the factory instance.
+	 * 用于创建工厂实例的内部实例化器。
 	 * @since 6.0
 	 * @param <T> the instance implementation type
 	 */
@@ -371,6 +393,7 @@ public class SpringFactoriesLoader {
 		}
 
 		T instantiate(@Nullable ArgumentResolver argumentResolver) throws Exception {
+			// 解析参数类型
 			Object[] args = resolveArgs(argumentResolver);
 			if (KOTLIN_REFLECT_PRESENT && KotlinDetector.isKotlinType(this.constructor.getDeclaringClass())) {
 				return KotlinDelegate.instantiate(this.constructor, args);
@@ -379,7 +402,9 @@ public class SpringFactoriesLoader {
 		}
 
 		private Object[] resolveArgs(@Nullable ArgumentResolver argumentResolver) {
+			// 参数类型
 			Class<?>[] types = this.constructor.getParameterTypes();
+			// 返回符合参数类型的对象数组
 			return (argumentResolver != null ?
 					Arrays.stream(types).map(argumentResolver::resolve).toArray() :
 					new Object[types.length]);
@@ -387,14 +412,17 @@ public class SpringFactoriesLoader {
 
 		@SuppressWarnings("unchecked")
 		static <T> FactoryInstantiator<T> forClass(Class<?> factoryImplementationClass) {
+			// 寻找合适的构造函数
 			Constructor<?> constructor = findConstructor(factoryImplementationClass);
 			Assert.state(constructor != null, () ->
 					"Class [%s] has no suitable constructor".formatted(factoryImplementationClass.getName()));
+			// 通过构造函数创建工厂实例
 			return new FactoryInstantiator<>((Constructor<T>) constructor);
 		}
 
 		private static @Nullable Constructor<?> findConstructor(Class<?> factoryImplementationClass) {
 			// Same algorithm as BeanUtils.getResolvableConstructor
+			// 与BeanUtils.getResolvableConstructor相同的算法
 			Constructor<?> constructor = findPrimaryKotlinConstructor(factoryImplementationClass);
 			constructor = (constructor != null ? constructor :
 					findSingleConstructor(factoryImplementationClass.getConstructors()));
@@ -427,6 +455,7 @@ public class SpringFactoriesLoader {
 
 	/**
 	 * Nested class to avoid a hard dependency on Kotlin at runtime.
+	 * 嵌套类，以避免在运行时对Kotlin的硬依赖。
 	 * @since 6.0
 	 */
 	private static class KotlinDelegate {
@@ -484,6 +513,7 @@ public class SpringFactoriesLoader {
 
 	/**
 	 * Strategy for resolving constructor arguments based on their type.
+	 * 基于构造函数参数的类型解析构造函数参数的策略。
 	 * @since 6.0
 	 * @see ArgumentResolver#of(Class, Object)
 	 * @see ArgumentResolver#ofSupplied(Class, Supplier)
@@ -494,6 +524,7 @@ public class SpringFactoriesLoader {
 
 		/**
 		 * Resolve the given argument if possible.
+		 * 如果可能，解析给定的参数。
 		 * @param <T> the argument type
 		 * @param type the argument type
 		 * @return the resolved argument value or {@code null}
@@ -503,6 +534,7 @@ public class SpringFactoriesLoader {
 		/**
 		 * Create a new composed {@link ArgumentResolver} by combining this resolver
 		 * with the given type and value.
+		 * 通过将此解析器与给定的类型和值组合，创建一个新的组合{@link ArgumentResolver}。
 		 * @param <T> the argument type
 		 * @param type the argument type
 		 * @param value the argument value
@@ -515,6 +547,7 @@ public class SpringFactoriesLoader {
 		/**
 		 * Create a new composed {@link ArgumentResolver} by combining this resolver
 		 * with the given type and value.
+		 * 通过将此解析器与给定的类型和值组合，创建一个新的组合{@link ArgumentResolver}。
 		 * @param <T> the argument type
 		 * @param type the argument type
 		 * @param valueSupplier the argument value supplier
@@ -527,6 +560,7 @@ public class SpringFactoriesLoader {
 		/**
 		 * Create a new composed {@link ArgumentResolver} by combining this resolver
 		 * with the given resolver.
+		 * 通过将此解析器与给定的解析器组合，创建一个新的组合{@link ArgumentResolver}。
 		 * @param argumentResolver the argument resolver to add
 		 * @return a new composite {@link ArgumentResolver} instance
 		 */
@@ -540,6 +574,7 @@ public class SpringFactoriesLoader {
 		/**
 		 * Factory method that returns an {@link ArgumentResolver} that always
 		 * returns {@code null}.
+		 * 返回{@link ArgumentResolver}的工厂方法总是返回{@code null}。
 		 * @return a new {@link ArgumentResolver} instance
 		 */
 		static ArgumentResolver none() {
@@ -549,6 +584,7 @@ public class SpringFactoriesLoader {
 		/**
 		 * Factory method that can be used to create an {@link ArgumentResolver}
 		 * that resolves only the given type.
+		 * 工厂方法，该方法可用于创建{@link ArgumentResolver}，该方法只解析给定的类型。
 		 * @param <T> the argument type
 		 * @param type the argument type
 		 * @param value the argument value
@@ -561,6 +597,7 @@ public class SpringFactoriesLoader {
 		/**
 		 * Factory method that can be used to create an {@link ArgumentResolver}
 		 * that resolves only the given type.
+		 * 工厂方法，该方法可用于创建{@link ArgumentResolver}，该方法只解析给定的类型。
 		 * @param <T> the argument type
 		 * @param type the argument type
 		 * @param valueSupplier the argument value supplier
@@ -574,6 +611,7 @@ public class SpringFactoriesLoader {
 		 * Factory method that creates a new {@link ArgumentResolver} from a
 		 * lambda friendly function. The given function is provided with the
 		 * argument type and must provide an instance of that type or {@code null}.
+		 * 从lambda友好函数创建一个新的{@link ArgumentResolver}的工厂方法。给定的函数提供了参数类型，并且必须提供该类型或{@code null}的实例。
 		 * @param function the resolver function
 		 * @return a new {@link ArgumentResolver} instance backed by the function
 		 */
@@ -591,6 +629,7 @@ public class SpringFactoriesLoader {
 
 	/**
 	 * Strategy for handling a failure that occurs when instantiating a factory.
+	 * 处理实例化工厂时发生的故障的策略。
 	 * @since 6.0
 	 * @see FailureHandler#throwing()
 	 * @see FailureHandler#logging(Log)

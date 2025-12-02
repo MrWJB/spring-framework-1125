@@ -114,9 +114,13 @@ class SpringFactoriesLoaderTests {
 
 	@Test
 	void loadWithArgumentResolverWhenNoDefaultConstructor() {
+		// 参数解析器
 		ArgumentResolver resolver = ArgumentResolver.of(String.class, "injected");
+
+		// 通过类加载器加载指定目录下的spring.factories文件，通过load方法加载DummyFactory接口的实现类
 		List<DummyFactory> factories = SpringFactoriesLoader.forDefaultResourceLocation(LimitedClassLoader.constructorArgumentFactories)
 					.load(DummyFactory.class, resolver);
+		// 断言
 		assertThat(factories).hasExactlyElementsOfTypes(MyDummyFactory1.class, MyDummyFactory2.class,
 				ConstructorArgsDummyFactory.class);
 		assertThat(factories).extracting(DummyFactory::getString).containsExactly("Foo", "Bar", "injected");
