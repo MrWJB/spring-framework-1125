@@ -52,6 +52,7 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 	/**
 	 * Calls the {@link #detectHandlers()} method in addition to the
 	 * superclass's initialization.
+	 * 除了超类的初始化之外，还会调用 {@link #detectHandlers()} 方法。
 	 */
 	@Override
 	public void initApplicationContext() throws ApplicationContextException {
@@ -61,9 +62,15 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 
 	/**
 	 * Register all handlers found in the current ApplicationContext.
+	 * 注册当前 ApplicationContext 中找到的所有处理程序。
+	 *
 	 * <p>The actual URL determination for a handler is up to the concrete
 	 * {@link #determineUrlsForHandler(String)} implementation. A bean for
 	 * which no such URLs could be determined is simply not considered a handler.
+	 *
+	 * 实际的处理程序 URL 确定取决于具体的 {@link #determineUrlsForHandler(String)} 实现。
+	 * 如果某个 bean 无法确定任何 URL，则该 bean 将不被视为处理程序。
+	 *
 	 * @throws org.springframework.beans.BeansException if the handler couldn't be registered
 	 * @see #determineUrlsForHandler(String)
 	 */
@@ -74,10 +81,12 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 				applicationContext.getBeanNamesForType(Object.class));
 
 		// Take any bean name that we can determine URLs for.
+		// 选取任何我们可以确定其 URL 的 Bean 名称。
 		for (String beanName : beanNames) {
 			String[] urls = determineUrlsForHandler(beanName);
 			if (!ObjectUtils.isEmpty(urls)) {
 				// URL paths found: Let's consider it a handler.
+				// 找到 URL 路径：我们将其视为一个处理程序。
 				registerHandler(urls, beanName);
 			}
 		}
@@ -93,8 +102,9 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 
 	/**
 	 * Determine the URLs for the given handler bean.
+	 * 确定给定处理程序 bean 的 URL。
 	 * @param beanName the name of the candidate bean
-	 * @return the URLs determined for the bean, or an empty array if none
+	 * @return the URLs determined for the bean, or an empty array if none 为 bean 确定的 URL，如果没有 URL，则返回空数组。
 	 */
 	protected abstract String[] determineUrlsForHandler(String beanName);
 

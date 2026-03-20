@@ -572,7 +572,9 @@ public abstract class StringUtils {
 	/**
 	 * Uncapitalize a {@code String}, changing the first letter to
 	 * lower case as per {@link Character#toLowerCase(char)}.
+	 * 将 {@code String} 的首字母转换为小写，并根据 {@link Character#toLowerCase(char)} 将其转换为小写。
 	 * No other letters are changed.
+	 * 其他字母不变。
 	 * @param str the {@code String} to uncapitalize
 	 * @return the uncapitalized {@code String}
 	 */

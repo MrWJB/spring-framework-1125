@@ -29,6 +29,7 @@ import org.springframework.core.NamedThreadLocal;
  * with the current thread. The LocaleContext will be inherited
  * by any child threads spawned by the current thread if the
  * {@code inheritable} flag is set to {@code true}.
+ * 一个简单的持有类，它将一个 LocaleContext 实例与当前线程关联起来。如果 {@code inheritable} 标志设置为 {@code true}，则当前线程创建的任何子线程都将继承该 LocaleContext。
  *
  * <p>Used as a central holder for the current Locale in Spring,
  * wherever necessary: for example, in MessageSourceAccessor.
@@ -113,6 +114,7 @@ public final class LocaleContextHolder {
 
 	/**
 	 * Return the LocaleContext associated with the current thread, if any.
+	 * 返回与当前线程关联的 LocaleContext（如果有）。
 	 * @return the current LocaleContext, or {@code null} if none
 	 */
 	public static @Nullable LocaleContext getLocaleContext() {

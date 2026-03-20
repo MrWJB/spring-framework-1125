@@ -56,8 +56,19 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 	private static final long serialVersionUID = 7930414337282325166L;
 
 
+	/**
+	 * Spring默认在目标类实现接口时是通过JDK代理实现的，只有非接口的是通过Cglib代理实现的。
+	 * 当设置proxy-target-class为true时在目标类不是接口或者代理类时优先使用cglib代理实现。
+	 * @param config the AOP configuration in the form of an
+	 * AdvisedSupport object
+	 * @return
+	 * @throws AopConfigException
+	 */
 	@Override
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+		// config.isOptimize() 是通过optimize设置，表示配置是自定义的，默认是false；
+		// config.isProxyTargetClass()是通过<aop:config proxy-target-class="true" /> 来配置的，表示优先使用cglib代理，默认是false；
+		// hasNoUserSuppliedProxyInterfaces(config) 表示是否目标类实现了接口
 		if (config.isOptimize() || config.isProxyTargetClass() || !config.hasUserSuppliedInterfaces()) {
 			Class<?> targetClass = config.getTargetClass();
 			if (targetClass == null && config.getProxiedInterfaces().length == 0) {

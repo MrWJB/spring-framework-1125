@@ -702,6 +702,7 @@ public class UrlPathHelper {
 
 	/**
 	 * Shared, read-only instance with defaults. The following apply:
+	 * 共享的只读实例，采用默认设置。适用以下条款：
 	 * <ul>
 	 * <li>{@code alwaysUseFullPath=false}
 	 * <li>{@code urlDecode=true}

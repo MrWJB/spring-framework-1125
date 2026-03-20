@@ -595,56 +595,58 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
 			// Prepare this context for refreshing.
-			// 准备此上下文以进行刷新。
+			// 1.准备刷新。
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
-			// 告诉子类刷新内部bean工厂。
+			// 2.创建BeanFactory（关键步骤）
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
-			// 准备在此上下文中使用的bean工厂。
+			// 3.配置BeanFactory
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
-				// 允许在上下文子类中对bean工厂进行后处理。
+				// 4.BeanFactory后处理
 				postProcessBeanFactory(beanFactory);
 
 				// 记录bean工厂后处理的启动
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
+
 				// Invoke factory processors registered as beans in the context.
-				// 调用在上下文中注册为bean的工厂处理器。
+				// 5.调用BeanFactory后处理器
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
-				// 注册拦截bean创建的bean处理器。
+				// 6.注册Bean后处理器
 				registerBeanPostProcessors(beanFactory);
+
 				// 记录bean工厂后处理的结束
 				beanPostProcess.end();
 
 				// Initialize message source for this context.
-				// 为此上下文初始化消息源。
+				// 7.初始化消息源
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
-				// 为此上下文初始化事件组播器。
+				// 8.初始化事件广播器
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
-				// 初始化特定上下文子类中的其他特殊bean。
+				// 9.初始化特殊Bean
 				onRefresh();
 
 				// Check for listener beans and register them.
-				// 检查侦听器bean并注册它们。
+				// 10.注册监听器
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
-				// 实例化所有剩余的（非lazy-init）单例。
+				// 11.预实例化单例Bean（调用BeanFactory的方法）
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
-				// 最后一步：发布相应的事件。
+				// 12. 完成刷新
 				finishRefresh();
 			}
 

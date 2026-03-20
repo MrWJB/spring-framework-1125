@@ -24,6 +24,7 @@ import jdk.jfr.Label;
 /**
  * {@link Event} extension for recording {@link FlightRecorderStartupStep}
  * in Java Flight Recorder.
+ * {@link Event} 扩展用于在 Java Flight Recorder 中记录 {@link FlightRecorderStartupStep}
  *
  * <p>{@link org.springframework.core.metrics.StartupStep.Tags} are serialized
  * as a single {@code String}, since Flight Recorder events do not support complex types.

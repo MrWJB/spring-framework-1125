@@ -622,12 +622,15 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		List<String> result = new ArrayList<>();
 
 		// Check all bean definitions.
+		// 检查所有 Bean 定义。
 		for (String beanName : this.beanDefinitionNames) {
 			// Only consider bean as eligible if the bean name is not defined as alias for some other bean.
+			// 仅当 bean 名称未定义为其他 bean 的别名时，才考虑将其视为符合条件的 bean。
 			if (!isAlias(beanName)) {
 				try {
 					RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
 					// Only check bean definition if it is complete.
+					// 仅当 bean 定义完整时才进行检查。
 					if (!mbd.isAbstract() && (allowEagerInit ||
 							(mbd.hasBeanClass() || !mbd.isLazyInit() || isAllowEagerClassLoading()) &&
 									!requiresEagerInitForType(mbd.getFactoryBeanName()))) {
@@ -648,11 +651,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							else if (allowFactoryBeanInit) {
 								// Type check before singleton check, avoiding FactoryBean instantiation
 								// for early FactoryBean.isSingleton() calls on non-matching beans.
+								// 在单例检查之前进行类型检查，避免对不匹配的 bean 过早调用 FactoryBean.isSingleton() 来实例化 FactoryBean。
 								matchFound = isTypeMatch(beanName, type, allowFactoryBeanInit) &&
 										isSingleton(beanName, mbd, dbd);
 							}
 							if (!matchFound) {
 								// In case of FactoryBean, try to match FactoryBean instance itself next.
+								// 如果是 FactoryBean，则尝试接下来匹配 FactoryBean 实例本身。
 								beanName = FACTORY_BEAN_PREFIX + beanName;
 								if (includeNonSingletons || isSingleton(beanName, mbd, dbd)) {
 									matchFound = isTypeMatch(beanName, type, allowFactoryBeanInit);
@@ -669,39 +674,48 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						throw ex;
 					}
 					// Probably a placeholder: let's ignore it for type matching purposes.
+					// 可能只是占位符：为了类型匹配，我们忽略它。
 					LogMessage message = (ex instanceof CannotLoadBeanClassException ?
 							LogMessage.format("Ignoring bean class loading failure for bean '%s'", beanName) :
 							LogMessage.format("Ignoring unresolvable metadata in bean definition '%s'", beanName));
 					logger.trace(message, ex);
 					// Register exception, in case the bean was accidentally unresolvable.
+					// 注册异常，以防 bean 意外无法解析。
 					onSuppressedException(ex);
 				}
 				catch (NoSuchBeanDefinitionException ex) {
 					// Bean definition got removed while we were iterating -> ignore.
+					// 迭代过程中 Bean 定义被删除 -> 忽略。
 				}
 			}
 		}
 
 		// Check manually registered singletons too.
+		// 还要检查手动注册的单例。
 		for (String beanName : this.manualSingletonNames) {
 			try {
 				// In case of FactoryBean, match object created by FactoryBean.
+				// 如果是 FactoryBean，则匹配 FactoryBean 创建的对象。
 				if (isFactoryBean(beanName)) {
 					if ((includeNonSingletons || isSingleton(beanName)) && isTypeMatch(beanName, type)) {
 						result.add(beanName);
 						// Match found for this bean: do not match FactoryBean itself anymore.
+						// 找到与此 bean 匹配的项：不再匹配 FactoryBean 本身。
 						continue;
 					}
 					// In case of FactoryBean, try to match FactoryBean itself next.
+					// 如果是 FactoryBean，接下来尝试匹配 FactoryBean 本身。
 					beanName = FACTORY_BEAN_PREFIX + beanName;
 				}
 				// Match raw bean instance (might be raw FactoryBean).
+				// 匹配原始 Bean 实例（可能是原始 FactoryBean）。
 				if (isTypeMatch(beanName, type)) {
 					result.add(beanName);
 				}
 			}
 			catch (NoSuchBeanDefinitionException ex) {
 				// Shouldn't happen - probably a result of circular reference resolution...
+				// 不应该发生这种情况——可能是循环参考系分解的结果……
 				logger.trace(LogMessage.format(
 						"Failed to check manually registered singleton with name '%s'", beanName), ex);
 			}
@@ -1412,6 +1426,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	/**
 	 * Reset all bean definition caches for the given bean,
 	 * including the caches of beans that are derived from it.
+	 * 重置给定 bean 的所有 bean 定义缓存，包括从该 bean 派生的 bean 的缓存。
+	 *
 	 * <p>Called after an existing bean definition has been replaced or removed,
 	 * triggering {@link #clearMergedBeanDefinition}, {@link #destroySingleton}
 	 * and {@link MergedBeanDefinitionPostProcessor#resetBeanDefinition} on the
@@ -1422,6 +1438,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 */
 	protected void resetBeanDefinition(String beanName) {
 		// Remove the merged bean definition for the given bean, if already created.
+		// 如果已创建，则删除给定 bean 的合并 bean 定义。
 		clearMergedBeanDefinition(beanName);
 
 		// Remove corresponding bean from singleton cache, if any. Shouldn't usually

@@ -49,7 +49,7 @@ public class HandlerExecutionChain {
 
 
 	/**
-	 * Create a new HandlerExecutionChain.
+	 * Create a new HandlerExecutionChain. 创建一个新的 HandlerExecutionChain。
 	 * @param handler the handler object to execute
 	 */
 	public HandlerExecutionChain(Object handler) {
@@ -68,9 +68,12 @@ public class HandlerExecutionChain {
 
 	/**
 	 * Create a new HandlerExecutionChain.
+	 * 创建一个新的HandlerExecutionChain
 	 * @param handler the handler object to execute
 	 * @param interceptorList the list of interceptors to apply
 	 * (in the given order) before the handler itself executes
+	 * 在处理程序本身执行之前，要应用的拦截器列表（按给定顺序）
+	 *
 	 * @since 5.3
 	 */
 	public HandlerExecutionChain(Object handler, List<HandlerInterceptor> interceptorList) {
@@ -94,6 +97,7 @@ public class HandlerExecutionChain {
 
 	/**
 	 * Add the given interceptor to the end of this chain.
+	 * 将给定的拦截器添加到该链的末尾。
 	 */
 	public void addInterceptor(HandlerInterceptor interceptor) {
 		this.interceptorList.add(interceptor);

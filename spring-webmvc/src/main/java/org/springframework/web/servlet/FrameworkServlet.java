@@ -204,6 +204,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	private boolean publishEvents = true;
 
 	/** Expose LocaleContext and RequestAttributes as inheritable for child threads?. */
+	// 是否将 LocaleContext 和 RequestAttributes 公开为子线程可继承的对象？
 	private boolean threadContextInheritable = false;
 
 	/** Should we dispatch an HTTP OPTIONS request to {@link #doService}?. */
@@ -515,6 +516,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	/**
 	 * Overridden method of {@link HttpServletBean}, invoked after any bean properties
 	 * have been set. Creates this servlet's WebApplicationContext.
+	 * 重写了 {@link HttpServletBean} 的方法，在设置了所有 bean 属性之后调用。创建此 servlet 的 WebApplicationContext。
 	 */
 	@Override
 	protected final void initServletBean() throws ServletException {
@@ -548,6 +550,8 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 	/**
 	 * Initialize and publish the WebApplicationContext for this servlet.
+	 * 初始化并发布此 servlet 的 WebApplicationContext。
+	 *
 	 * <p>Delegates to {@link #createWebApplicationContext} for actual creation
 	 * of the context. Can be overridden in subclasses.
 	 * @return the WebApplicationContext instance
@@ -865,6 +869,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	/**
 	 * Override the parent class implementation in order to intercept requests
 	 * using PATCH or non-standard HTTP methods (WebDAV).
+	 * 重写父类实现，以便拦截使用 PATCH 或非标准 HTTP 方法（WebDAV）的请求。
 	 */
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
@@ -979,27 +984,36 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 	/**
 	 * Process this request, publishing an event regardless of the outcome.
+	 * 处理此请求，无论结果如何，都将发布事件。
 	 * <p>The actual event handling is performed by the abstract
 	 * {@link #doService} template method.
+	 * 实际的事件处理由抽象的 {@link #doService} 模板方法执行。
 	 */
 	protected final void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		// 记录开始时间
 		long startTime = System.currentTimeMillis();
 		Throwable failureCause = null;
 
+		// 返回与当前线程关联的 LocaleContext（如果有）
 		LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
+		// 构建LocaleContext
 		LocaleContext localeContext = buildLocaleContext(request);
 
+		// 与当前线程绑定的RequestAttributes
 		RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
 		ServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
 
+		// WebAsyncManager是 Spring MVC 中管理异步请求处理流程的核心类，主要负责协调异步操作的启动、结果处理以及线程切换。它充当同步 Servlet 容器与异步处理逻辑之间的桥梁。
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 		asyncManager.registerCallableInterceptor(FrameworkServlet.class.getName(), new RequestBindingInterceptor());
 
+		// 初始化localeContext、requestAttributes
 		initContextHolders(request, localeContext, requestAttributes);
 
 		try {
+			// 实际处理
 			doService(request, response);
 		}
 		catch (ServletException | IOException ex) {
@@ -1012,11 +1026,13 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 
 		finally {
+			// 还原previousLocaleContext、previousAttributes
 			resetContextHolders(request, previousLocaleContext, previousAttributes);
 			if (requestAttributes != null) {
 				requestAttributes.requestCompleted();
 			}
 			logResult(request, response, failureCause, asyncManager);
+			// 发布事件
 			publishRequestHandledEvent(request, response, startTime, failureCause);
 		}
 	}
@@ -1024,6 +1040,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	/**
 	 * Build a LocaleContext for the given request, exposing the request's
 	 * primary locale as current locale.
+	 * 为给定的请求构建一个 LocaleContext，将请求的主要区域设置公开为当前区域设置。
 	 * @param request current HTTP request
 	 * @return the corresponding LocaleContext, or {@code null} if none to bind
 	 * @see LocaleContextHolder#setLocaleContext
@@ -1188,6 +1205,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	/**
 	 * CallableProcessingInterceptor implementation that initializes and resets
 	 * FrameworkServlet's context holders, i.e. LocaleContextHolder and RequestContextHolder.
+	 * CallableProcessingInterceptor 实现，用于初始化和重置 FrameworkServlet 的上下文持有者，即 LocaleContextHolder 和 RequestContextHolder。
 	 */
 	private class RequestBindingInterceptor implements CallableProcessingInterceptor {
 

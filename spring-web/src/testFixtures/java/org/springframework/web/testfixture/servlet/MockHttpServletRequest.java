@@ -541,8 +541,10 @@ public class MockHttpServletRequest implements HttpServletRequest {
 
 	/**
 	 * Add a single value for the specified HTTP parameter.
+	 * 为指定的HTTP参数添加一个值。
 	 * <p>If there are already one or more values registered for the given
 	 * parameter name, the given value will be added to the end of the list.
+	 * 如果给定的参数名称已经注册了一个或多个值，则将给定的值添加到列表的末尾。
 	 */
 	public void addParameter(String name, @Nullable String value) {
 		addParameter(name, new String[] {value});
@@ -550,8 +552,10 @@ public class MockHttpServletRequest implements HttpServletRequest {
 
 	/**
 	 * Add an array of values for the specified HTTP parameter.
+	 * 为指定的HTTP参数添加值数组。
 	 * <p>If there are already one or more values registered for the given
 	 * parameter name, the given values will be added to the end of the list.
+	 * 如果给定的参数名称已经注册了一个或多个值，则将给定的值添加到列表的末尾。
 	 */
 	public void addParameter(String name, String... values) {
 		Assert.notNull(name, "Parameter name must not be null");

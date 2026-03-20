@@ -21,6 +21,7 @@ import org.springframework.util.Assert;
 /**
  * {@link InheritableThreadLocal} subclass that exposes a specified name
  * as {@link #toString()} result (allowing for introspection).
+ * {@link InheritableThreadLocal} 子类，公开指定的名称作为 {@link #toString()} 结果（允许自省）。
  *
  * @author Juergen Hoeller
  * @since 2.5.2

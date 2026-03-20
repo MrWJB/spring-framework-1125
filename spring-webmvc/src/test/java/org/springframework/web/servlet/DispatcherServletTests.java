@@ -125,6 +125,7 @@ class DispatcherServletTests {
 	void configuredDispatcherServlets() {
 		assertThat((simpleDispatcherServlet.getNamespace())).as("Correct namespace")
 				.isEqualTo("simple" + FrameworkServlet.DEFAULT_NAMESPACE_SUFFIX);
+
 		assertThat((FrameworkServlet.SERVLET_CONTEXT_PREFIX + "simple")).as("Correct attribute")
 				.isEqualTo(simpleDispatcherServlet.getServletContextAttributeName());
 		assertThat(simpleDispatcherServlet.getWebApplicationContext()).as("Context published")

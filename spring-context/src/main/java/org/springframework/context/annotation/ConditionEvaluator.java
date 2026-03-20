@@ -63,8 +63,12 @@ class ConditionEvaluator {
 
 	/**
 	 * Determine if an item should be skipped based on {@code @Conditional} annotations.
+	 * 根据 {@code @Conditional} 注解确定是否应跳过某个项目。
+	 *
 	 * The {@link ConfigurationPhase} will be deduced from the type of item (i.e. a
 	 * {@code @Configuration} class will be {@link ConfigurationPhase#PARSE_CONFIGURATION})
+	 * {@link ConfigurationPhase} 将从项目类型推断出来（例如， {@code @Configuration} 类将是 {@link ConfigurationPhase#PARSE_CONFIGURATION}）。
+	 *
 	 * @param metadata the meta data
 	 * @return if the item should be skipped
 	 */
@@ -74,6 +78,8 @@ class ConditionEvaluator {
 
 	/**
 	 * Determine if an item should be skipped based on {@code @Conditional} annotations.
+	 * 根据 {@code @Conditional} 注解确定是否应跳过某个项目。
+	 *
 	 * @param metadata the meta data
 	 * @param phase the phase of the call
 	 * @return if the item should be skipped
@@ -108,6 +114,8 @@ class ConditionEvaluator {
 	/**
 	 * Return the {@linkplain Condition conditions} that should be applied when
 	 * considering the given annotated type.
+	 * 返回在考虑给定注解类型时应应用的 {@linkplain Condition conditions}。
+	 *
 	 * @param metadata the metadata of the annotated type
 	 * @return the ordered list of conditions for that type
 	 */
@@ -159,6 +167,7 @@ class ConditionEvaluator {
 				@Nullable Environment environment, @Nullable ResourceLoader resourceLoader) {
 
 			this.registry = registry;
+			// 获取Bean工厂
 			this.beanFactory = deduceBeanFactory(registry);
 			this.environment = (environment != null ? environment : deduceEnvironment(registry));
 			this.resourceLoader = (resourceLoader != null ? resourceLoader : deduceResourceLoader(registry));

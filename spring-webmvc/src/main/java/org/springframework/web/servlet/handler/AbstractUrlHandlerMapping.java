@@ -122,6 +122,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 
 	/**
 	 * Register the specified handler for the given URL paths.
+	 * 为给定的 URL 路径注册指定的处理程序。
 	 * @param urlPaths the URLs that the bean should be mapped to
 	 * @param beanName the name of the handler bean
 	 * @throws BeansException if the handler couldn't be registered
@@ -137,6 +138,8 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 
 	/**
 	 * Register the specified handler for the given URL path.
+	 * 为给定的 URL 路径注册指定的处理程序。
+	 *
 	 * @param urlPath the URL the bean should be mapped to
 	 * @param handler the handler instance or handler bean name String
 	 * (a bean name will automatically be resolved into the corresponding handler bean)
@@ -150,6 +153,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 		Object resolvedHandler = handler;
 
 		// Eagerly resolve handler if referencing singleton via name.
+		// 如果通过名称引用单例，则立即解析处理程序。
 		if (!this.lazyInitHandlers && handler instanceof String handlerName) {
 			ApplicationContext applicationContext = obtainApplicationContext();
 			if (applicationContext.isSingleton(handlerName)) {
@@ -235,6 +239,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 
 	/**
 	 * Look up a handler for the URL path of the given request.
+	 * 查找给定请求的 URL 路径的处理程序。
 	 * @param request current HTTP request
 	 * @return the handler instance, or {@code null} if none found
 	 */
@@ -286,7 +291,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 	@SuppressWarnings("NullAway") // Dataflow analysis limitation
 	protected @Nullable Object lookupHandler(
 			RequestPath path, String lookupPath, HttpServletRequest request) throws Exception {
-
+		// 返回拦截器链
 		Object handler = getDirectMatch(lookupPath, request);
 		if (handler != null) {
 			return handler;
@@ -421,6 +426,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 	 * Build a handler object for the given raw handler, exposing the actual
 	 * handler, the {@link #PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE}, as well as
 	 * the {@link #URI_TEMPLATE_VARIABLES_ATTRIBUTE} before executing the handler.
+	 * 为给定的原始处理程序构建处理程序对象，在执行处理程序之前公开实际的处理程序、{@link #PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE} 以及 {@link #URI_TEMPLATE_VARIABLES_ATTRIBUTE}。
 	 * <p>The default implementation builds a {@link HandlerExecutionChain}
 	 * with a special interceptor that exposes the path attribute and URI
 	 * template variables

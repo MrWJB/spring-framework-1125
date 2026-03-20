@@ -36,9 +36,12 @@ import org.springframework.util.Assert;
 
 /**
  * Convenient adapter for programmatic registration of bean classes.
+ * 用于以编程方式注册 bean 类的便捷适配器。
  *
  * <p>This is an alternative to {@link ClassPathBeanDefinitionScanner}, applying
  * the same resolution of annotations but for explicitly registered classes only.
+ *
+ * 这是 {@link ClassPathBeanDefinitionScanner} 的替代方案，它应用相同的注解解析，但仅适用于显式注册的类。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
@@ -61,9 +64,14 @@ public class AnnotatedBeanDefinitionReader {
 
 	/**
 	 * Create a new {@code AnnotatedBeanDefinitionReader} for the given registry.
+	 * 为给定的注册表创建一个新的 {@code AnnotatedBeanDefinitionReader}。
+	 *
 	 * <p>If the registry is {@link EnvironmentCapable}, for example, is an {@code ApplicationContext},
 	 * the {@link Environment} will be inherited, otherwise a new
 	 * {@link StandardEnvironment} will be created and used.
+	 *
+	 * 例如，如果注册表是 {@link EnvironmentCapable}，并且是 {@code ApplicationContext}，则会继承 {@link Environment}，否则将创建一个新的 {@link StandardEnvironment} 并使用它。
+	 *
 	 * @param registry the {@code BeanFactory} to load bean definitions into,
 	 * in the form of a {@code BeanDefinitionRegistry}
 	 * @see #AnnotatedBeanDefinitionReader(BeanDefinitionRegistry, Environment)
@@ -76,6 +84,7 @@ public class AnnotatedBeanDefinitionReader {
 	/**
 	 * Create a new {@code AnnotatedBeanDefinitionReader} for the given registry,
 	 * using the given {@link Environment}.
+	 * 使用给定的 {@link Environment} 为给定的注册表创建一个新的 {@code AnnotatedBeanDefinitionReader}。
 	 * @param registry the {@code BeanFactory} to load bean definitions into,
 	 * in the form of a {@code BeanDefinitionRegistry}
 	 * @param environment the {@code Environment} to use when evaluating bean definition

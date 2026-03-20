@@ -65,15 +65,18 @@ public abstract class ServletRequestPathUtils {
 	/**
 	 * Variant of {@link #parse(HttpServletRequest)} that also saves the parsed
 	 * path in the request attribute {@link #PATH_ATTRIBUTE}.
+	 * 解释：{@link #parse(HttpServletRequest)} 的变体，它还会将解析后的路径保存到请求属性 {@link #PATH_ATTRIBUTE} 中。
+	 *
 	 */
 	public static RequestPath parseAndCache(HttpServletRequest request) {
 		RequestPath requestPath = ServletRequestPath.parse(request);
-		request.setAttribute(PATH_ATTRIBUTE, requestPath);
+		request.setAttribute(PATH_ATTRIBUTE, requestPath); // org.springframework.web.util.ServletRequestPathUtils.PATH
 		return requestPath;
 	}
 
 	/**
 	 * Return a {@link #parseAndCache  previously} parsed and cached {@code RequestPath}.
+	 * 返回一个已解析并缓存的 {@code RequestPath}。
 	 * @throws IllegalArgumentException if not found
 	 */
 	public static RequestPath getParsedRequestPath(ServletRequest request) {
@@ -185,6 +188,7 @@ public abstract class ServletRequestPathUtils {
 	/**
 	 * Check if the Servlet is mapped by a path prefix, and if so return that
 	 * path prefix.
+	 * 检查 Servlet 是否通过路径前缀映射，如果是，则返回该路径前缀。
 	 * @param request the current request
 	 * @return the prefix, or {@code null} if the Servlet is not mapped by prefix
 	 * @since 6.2.3
@@ -270,7 +274,7 @@ public abstract class ServletRequestPathUtils {
 
 
 		public static RequestPath parse(HttpServletRequest request) {
-			String requestUri = (String) request.getAttribute(WebUtils.INCLUDE_REQUEST_URI_ATTRIBUTE);
+			String requestUri = (String) request.getAttribute(WebUtils.INCLUDE_REQUEST_URI_ATTRIBUTE); // jakarta.servlet.include.request_uri
 			requestUri = (requestUri != null ? requestUri : request.getRequestURI());
 			String servletPathPrefix = getServletPathPrefix(request);
 			if (!StringUtils.hasLength(servletPathPrefix)) {

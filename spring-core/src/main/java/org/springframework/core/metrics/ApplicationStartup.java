@@ -29,7 +29,10 @@ public interface ApplicationStartup {
 
 	/**
 	 * Default "no op" {@code ApplicationStartup} implementation.
+	 * 默认“无操作”{@code ApplicationStartup} 实现。
+	 *
 	 * <p>This variant is designed for minimal overhead and does not record data.
+	 * 此版本旨在最大限度地减少开销，并且不记录数据。
 	 */
 	ApplicationStartup DEFAULT = new DefaultApplicationStartup();
 

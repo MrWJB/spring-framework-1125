@@ -443,19 +443,25 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 	/**
 	 * Initializes the interceptors.
+	 * 初始化拦截器。
 	 * @see #extendInterceptors(java.util.List)
 	 * @see #initInterceptors()
 	 */
 	@Override
 	protected void initApplicationContext() throws BeansException {
+		// 子类扩展的拦截器（重写）
 		extendInterceptors(this.interceptors);
+		// 查找当前上下文中MappedInterceptor类型的bean，添加到adaptedInterceptors拦截器列表中
 		detectMappedInterceptors(this.adaptedInterceptors);
+		// 初始化拦截器
 		initInterceptors();
 	}
 
 	/**
 	 * Extension hook that subclasses can override to register additional interceptors,
 	 * given the configured interceptors (see {@link #setInterceptors}).
+	 * 子类可以重写的扩展钩子，用于注册额外的拦截器，给定已配置的拦截器（参见{@link #setInterceptors}）。
+	 *
 	 * <p>Will be invoked before {@link #initInterceptors()} adapts the specified
 	 * interceptors into {@link HandlerInterceptor} instances.
 	 * <p>The default implementation is empty.
@@ -468,6 +474,8 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	/**
 	 * Detect beans of type {@link MappedInterceptor} and add them to the list
 	 * of mapped interceptors.
+	 * 检测类型为 {@link MappedInterceptor} 的 bean，并将它们添加到已映射拦截器的列表中。
+	 *
 	 * <p>This is called in addition to any {@link MappedInterceptor}s that may
 	 * have been provided via {@link #setInterceptors}, by default adding all
 	 * beans of type {@link MappedInterceptor} from the current context and its
@@ -481,6 +489,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 	/**
 	 * Initialize the specified interceptors adapting
+	 * 初始化指定的拦截器以进行适配
 	 * {@link WebRequestInterceptor}s to {@link HandlerInterceptor}.
 	 * @see #setInterceptors
 	 * @see #adaptInterceptor
@@ -533,6 +542,8 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	/**
 	 * Look up a handler for the given request, falling back to the default
 	 * handler if no specific one is found.
+	 * 查找给定请求的处理程序，如果找不到特定处理程序，则回退到默认处理程序。
+	 *
 	 * @param request current HTTP request
 	 * @return the corresponding handler instance, or the default handler
 	 * @see #getHandlerInternal
@@ -547,16 +558,18 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		if (handler == null) {
 			return null;
 		}
-		// Bean name or resolved handler?
+		// Bean name or resolved handler? Bean 名称还是已解析的处理程序？
 		if (handler instanceof String handlerName) {
 			handler = obtainApplicationContext().getBean(handlerName);
 		}
 
 		// Ensure presence of cached lookupPath for interceptors and others
+		// 确保拦截器和其他组件存在缓存的查找路径
 		if (!ServletRequestPathUtils.hasCachedPath(request)) {
 			initLookupPath(request);
 		}
 
+		// 为给定的处理程序构建一个 {@link HandlerExecutionChain}，包括适用的拦截器。
 		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request);
 
 		if (request.getAttribute(SUPPRESS_LOGGING_ATTRIBUTE) == null) {
@@ -616,19 +629,24 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 	/**
 	 * Initialize the path to use for request mapping.
+	 * 初始化用于请求映射的路径。
 	 * <p>When parsed patterns are {@link #usesPathPatterns() enabled} a parsed
 	 * {@code RequestPath} is expected to have been
 	 * {@link ServletRequestPathUtils#parseAndCache(HttpServletRequest) parsed}
 	 * externally by the {@link org.springframework.web.servlet.DispatcherServlet}
 	 * or {@link org.springframework.web.filter.ServletRequestPathFilter}.
+	 * 当解析模式启用 {@link #usesPathPatterns() 时，解析后的 {@code RequestPath} 应该已经由 {@link org.springframework.web.servlet.DispatcherServlet}
+	 * 或 {@link org.springframework.web.filter.ServletRequestPathFilter} 通过 {@link ServletRequestPathUtils#parseAndCache(HttpServletRequest) 解析} 进行外部解析。
+	 *
 	 * <p>Otherwise for String pattern matching via {@code PathMatcher} the
 	 * path is {@link UrlPathHelper#resolveAndCacheLookupPath resolved} by this
 	 * method.
+	 * 否则，对于通过 {@code PathMatcher} 进行字符串模式匹配，路径将通过此方法解析为 {@link UrlPathHelper#resolveAndCacheLookupPath}。
 	 * @since 5.3
 	 */
 	protected String initLookupPath(HttpServletRequest request) {
 		if (usesPathPatterns()) {
-			request.removeAttribute(UrlPathHelper.PATH_ATTRIBUTE);
+			request.removeAttribute(UrlPathHelper.PATH_ATTRIBUTE); // org.springframework.web.util.UrlPathHelper.PATH
 			RequestPath requestPath = getRequestPath(request);
 			String lookupPath = requestPath.pathWithinApplication().value();
 			return UrlPathHelper.defaultInstance.removeSemicolonContent(lookupPath);
@@ -639,9 +657,9 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	}
 
 	private RequestPath getRequestPath(HttpServletRequest request) {
-		// Expect pre-parsed path with DispatcherServlet,
-		// but otherwise parse per handler lookup + cache for handling
-		return (request.getAttribute(DispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE) != null ?
+		// Expect pre-parsed path with DispatcherServlet, but otherwise parse per handler lookup + cache for handling
+		// 使用 DispatcherServlet 时预期会预先解析路径，否则将根据处理程序查找进行解析，并缓存处理程序。
+		return (request.getAttribute(DispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE) != null ? // org.springframework.web.servlet.DispatcherServlet.CONTEXT
 				ServletRequestPathUtils.getParsedRequestPath(request) :
 				ServletRequestPathUtils.parseAndCache(request));
 	}
@@ -649,6 +667,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	/**
 	 * Build a {@link HandlerExecutionChain} for the given handler, including
 	 * applicable interceptors.
+	 * 为给定的处理程序构建一个 {@link HandlerExecutionChain}，包括适用的拦截器。
 	 * <p>The default implementation builds a standard {@link HandlerExecutionChain}
 	 * with the given handler, the common interceptors of the handler mapping, and any
 	 * {@link MappedInterceptor MappedInterceptors} matching to the current request URL. Interceptors

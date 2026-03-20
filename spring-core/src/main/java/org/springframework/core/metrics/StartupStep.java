@@ -22,6 +22,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Step recording metrics about a particular phase or action happening during the {@link ApplicationStartup}.
+ * 步骤记录有关 {@link ApplicationStartup} 期间发生的特定阶段或操作的指标。
  *
  * <p>The lifecycle of a {@code StartupStep} goes as follows:
  * <ol>
@@ -79,7 +80,9 @@ public interface StartupStep extends AutoCloseable {
 
 	/**
 	 * Record the state of the step and possibly other metrics like execution time.
+	 * 记录步骤状态以及其他指标，例如执行时间。
 	 * <p>Once ended, changes on the step state are not allowed.
+	 * 步骤结束后，不允许更改步骤状态。
 	 */
 	void end();
 

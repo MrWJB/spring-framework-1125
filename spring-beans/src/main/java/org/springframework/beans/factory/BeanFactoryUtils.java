@@ -341,16 +341,25 @@ public abstract class BeanFactoryUtils {
 	 * Return all beans of the given type or subtypes, also picking up beans defined in
 	 * ancestor bean factories if the current bean factory is a HierarchicalBeanFactory.
 	 * The returned Map will only contain beans of this type.
+	 * 返回给定类型或子类型的所有 bean，如果当前 bean 工厂是 HierarchicalBeanFactory，则还会包含祖先 bean 工厂中定义的 bean。返回的 Map 将仅包含此类型的 bean。
+	 *
 	 * <p>Does consider objects created by FactoryBeans if the "allowEagerInit" flag is set,
 	 * which means that FactoryBeans will get initialized. If the object created by the
 	 * FactoryBean doesn't match, the raw FactoryBean itself will be matched against the
 	 * type. If "allowEagerInit" is not set, only raw FactoryBeans will be checked
 	 * (which doesn't require initialization of each FactoryBean).
+	 * 如果设置了“allowEagerInit”标志，则会考虑由 FactoryBean 创建的对象，这意味着 FactoryBean 将被初始化。
+	 * 如果 FactoryBean 创建的对象不匹配，则会将原始 FactoryBean 本身与类型进行匹配。
+	 * 如果未设置“allowEagerInit”，则只会检查原始 FactoryBean（这不需要初始化每个 FactoryBean）。
+	 *
 	 * <p><b>Note: Beans of the same name will take precedence at the 'lowest' factory level,
 	 * i.e. such beans will be returned from the lowest factory that they are being found in,
 	 * hiding corresponding beans in ancestor factories.</b> This feature allows for
 	 * 'replacing' beans by explicitly choosing the same bean name in a child factory;
 	 * the bean in the ancestor factory won't be visible then, not even for by-type lookups.
+	 * 注意：同名 bean 在“最低”工厂级别具有优先权，也就是说，此类 bean 将从它们所在的最低工厂返回，从而隐藏祖先工厂中对应的 bean。
+	 * 此功能允许通过在子工厂中显式选择相同的 bean 名称来“替换”bean；祖先工厂中的 bean 将不可见，即使是按类型查找也不可见。
+	 *
 	 * @param lbf the bean factory
 	 * @param type the type of bean to match
 	 * @param includeNonSingletons whether to include prototype or scoped beans too
@@ -370,9 +379,11 @@ public abstract class BeanFactoryUtils {
 
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
 		Map<String, T> result = new LinkedHashMap<>(4);
+
 		result.putAll(lbf.getBeansOfType(type, includeNonSingletons, allowEagerInit));
 		if (lbf instanceof HierarchicalBeanFactory hbf) {
 			if (hbf.getParentBeanFactory() instanceof ListableBeanFactory pbf) {
+				// 处理祖先 bean 工厂中定义的 bean
 				Map<String, T> parentResult = beansOfTypeIncludingAncestors(pbf, type, includeNonSingletons, allowEagerInit);
 				parentResult.forEach((beanName, beanInstance) -> {
 					if (!result.containsKey(beanName) && !hbf.containsLocalBean(beanName)) {

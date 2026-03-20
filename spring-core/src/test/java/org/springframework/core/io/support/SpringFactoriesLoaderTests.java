@@ -69,6 +69,9 @@ class SpringFactoriesLoaderTests {
 	}
 
 
+	/**
+	 * 加载工厂类
+	 */
 	@Test
 	@Deprecated
 	void loadFactoryNames() {
@@ -76,18 +79,28 @@ class SpringFactoriesLoaderTests {
 		assertThat(factoryNames).containsExactlyInAnyOrder(MyDummyFactory1.class.getName(), MyDummyFactory2.class.getName());
 	}
 
+	/**
+	 * 当没有注册的实现返回空列表时加载
+	 */
 	@Test
 	void loadWhenNoRegisteredImplementationsReturnsEmptyList() {
 		List<Integer> factories = SpringFactoriesLoader.forDefaultResourceLocation().load(Integer.class);
 		assertThat(factories).isEmpty();
 	}
 
+	/**
+	 * 当重复的注册以正确的顺序呈现返回列表时加载
+	 */
 	@Test
 	void loadWhenDuplicateRegistrationsPresentReturnsListInCorrectOrder() {
 		List<DummyFactory> factories = SpringFactoriesLoader.forDefaultResourceLocation().load(DummyFactory.class);
 		assertThat(factories).hasExactlyElementsOfTypes(MyDummyFactory1.class, MyDummyFactory2.class);
 	}
 
+
+	/**
+	 * 判断类是否为私包
+	 */
 	@Test
 	void loadWhenPackagePrivateFactory() {
 		List<DummyPackagePrivateFactory> factories =
@@ -96,6 +109,9 @@ class SpringFactoriesLoaderTests {
 		assertThat(Modifier.isPublic(factories.get(0).getClass().getModifiers())).isFalse();
 	}
 
+	/**
+	 * 加载不兼容的类型抛出异常时加载
+	 */
 	@Test
 	void loadWhenIncompatibleTypeThrowsException() {
 		assertThatIllegalArgumentException()
@@ -104,6 +120,10 @@ class SpringFactoriesLoaderTests {
 					"[org.springframework.core.io.support.MyDummyFactory1] for factory type [java.lang.String]");
 	}
 
+
+	/**
+	 * 加载不兼容的类型返回空列表时，加载日志失败处理程序
+	 */
 	@Test
 	void loadWithLoggingFailureHandlerWhenIncompatibleTypeReturnsEmptyList() {
 		Log logger = mock();
@@ -112,6 +132,9 @@ class SpringFactoriesLoaderTests {
 		assertThat(factories).isEmpty();
 	}
 
+	/**
+	 * 在没有默认构造函数时加载带参数解析器
+	 */
 	@Test
 	void loadWithArgumentResolverWhenNoDefaultConstructor() {
 		// 参数解析器
@@ -126,26 +149,42 @@ class SpringFactoriesLoaderTests {
 		assertThat(factories).extracting(DummyFactory::getString).containsExactly("Foo", "Bar", "injected");
 	}
 
+	/**
+	 * 当多个构造函数抛出异常时加载
+	 */
 	@Test
 	void loadWhenMultipleConstructorsThrowsException() {
+		// 如果方法传入的参数与of方法传入的类型匹配，那么就返回of方法的value值。
 		ArgumentResolver resolver = ArgumentResolver.of(String.class, "injected");
 		assertThatIllegalArgumentException()
 				.isThrownBy(() -> SpringFactoriesLoader.forDefaultResourceLocation(LimitedClassLoader.multipleArgumentFactories)
 							.load(DummyFactory.class, resolver))
+
 				.withMessageContaining("Unable to instantiate factory class " +
 						"[org.springframework.core.io.support.MultipleConstructorArgsDummyFactory] for factory type [org.springframework.core.io.support.DummyFactory]")
 				.havingRootCause().withMessageContaining("Class [org.springframework.core.io.support.MultipleConstructorArgsDummyFactory] has no suitable constructor");
 	}
 
+
+	/**
+	 * 当缺少参数项时，加载日志失败处理程序
+	 */
 	@Test
 	void loadWithLoggingFailureHandlerWhenMissingArgumentDropsItem() {
 		Log logger = mock();
+		// 失败处理程序
 		FailureHandler failureHandler = FailureHandler.logging(logger);
+		// 通过指定的类加载器加载spring.factories文件，加载DummyFactory接口的实现类
 		List<DummyFactory> factories = SpringFactoriesLoader.forDefaultResourceLocation(LimitedClassLoader.multipleArgumentFactories)
 					.load(DummyFactory.class, failureHandler);
+		// 断言（hasExactlyElementsOfTypes 方法用于检查集合中的元素是否仅包含指定类型的元素，并且每个类型的元素数量与预期一致。这个方法可以帮助你在测试中验证集合的元素类型分布。）
 		assertThat(factories).hasExactlyElementsOfTypes(MyDummyFactory1.class, MyDummyFactory2.class);
 	}
 
+
+	/**
+	 * 加载工厂从默认位置加载
+	 */
 	@Test
 	void loadFactoriesLoadsFromDefaultLocation() {
 		List<DummyFactory> factories = SpringFactoriesLoader.loadFactories(
@@ -153,13 +192,22 @@ class SpringFactoriesLoaderTests {
 		assertThat(factories).hasExactlyElementsOfTypes(MyDummyFactory1.class, MyDummyFactory2.class);
 	}
 
+
+	/**
+	 * 当资源位置不存在时，加载资源位置返回空列表
+	 */
 	@Test
 	void loadForResourceLocationWhenLocationDoesNotExistReturnsEmptyList() {
 		List<DummyFactory> factories = SpringFactoriesLoader.forResourceLocation(
 				"META-INF/missing/missing-spring.factories").load(DummyFactory.class);
+		// 断言
 		assertThat(factories).isEmpty();
 	}
 
+
+	/**
+	 * 从指定资源位置加载
+	 */
 	@Test
 	void loadForResourceLocationLoadsFactories() {
 		List<DummyFactory> factories = SpringFactoriesLoader.forResourceLocation(
@@ -167,6 +215,9 @@ class SpringFactoriesLoaderTests {
 		assertThat(factories).hasExactlyElementsOfTypes(MyDummyFactory1.class);
 	}
 
+	/**
+	 * 传入默认类加载器和传空（null）使用相同的缓存结果
+	 */
 	@Test
 	void sameCachedResultIsUsedForDefaultClassLoaderAndNullClassLoader() {
 		SpringFactoriesLoader forNull = SpringFactoriesLoader.forDefaultResourceLocation(null);
@@ -174,16 +225,27 @@ class SpringFactoriesLoaderTests {
 		assertThat(forNull).extracting("factories").isSameAs(Extractors.byName("factories").apply(forDefault));
 	}
 
+
+	/**
+	 * 陈旧类装入器与缓存结果一起使用
+	 */
 	@Test
 	void staleClassLoaderIsUsedWithCachedResult() {
+		// 默认类加载器
 		ClassLoader defaultClassLoader = ClassUtils.getDefaultClassLoader();
 		ClassLoader cl1 = new ClassLoader() {
 		};
+
+		// 通过默认类加载器加载资源
 		SpringFactoriesLoader factories1 = SpringFactoriesLoader.forDefaultResourceLocation(defaultClassLoader);
 		assertThat(factories1).extracting("classLoader").isEqualTo(defaultClassLoader);
+
+		// 线程上下文类加载器
 		ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
 		try {
+			// 设置线程上下文类加载器
 			Thread.currentThread().setContextClassLoader(cl1);
+			//
 			SpringFactoriesLoader factories2 = SpringFactoriesLoader.forDefaultResourceLocation(null);
 			assertThat(factories2).extracting("classLoader").isNull();
 		}

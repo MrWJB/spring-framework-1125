@@ -125,18 +125,21 @@ public class SpringFactoriesLoader {
 	 * Load and instantiate the factory implementations of the given type from
 	 * {@value #FACTORIES_RESOURCE_LOCATION}, using the configured class loader
 	 * and a default argument resolver that expects a no-arg constructor.
+	 * 从{@value FACTORIES_RESOURCE_LOCATION}加载并实例化给定类型的工厂实现，使用已配置的类装入器和默认的参数解析器，该解析器期望使用无参数构造函数。
+	 *
 	 * <p>The returned factories are sorted using {@link AnnotationAwareOrderComparator}.
 	 * <p>If a custom instantiation strategy is required, use {@code load(...)}
 	 * with a custom {@link ArgumentResolver ArgumentResolver} and/or
 	 * {@link FailureHandler FailureHandler}.
 	 * <p>If duplicate implementation class names are discovered for a given factory
 	 * type, only one instance of the duplicated implementation type will be instantiated.
-	 * @param factoryType the interface or abstract class representing the factory
+	 * @param factoryType the interface or abstract class representing the factory 表示工厂的接口或抽象类
 	 * @throws IllegalArgumentException if any factory implementation class cannot
 	 * be loaded or if an error occurs while instantiating any factory
 	 * @since 6.0
 	 */
 	public <T> List<T> load(Class<T> factoryType) {
+		// 加载指定类型的类并实例化
 		return load(factoryType, null, null);
 	}
 
@@ -179,6 +182,7 @@ public class SpringFactoriesLoader {
 	 * {@value #FACTORIES_RESOURCE_LOCATION}, using the configured class loader,
 	 * the given argument resolver, and custom failure handling provided by the given
 	 * failure handler.
+	 * 从{@value FACTORIES_RESOURCE_LOCATION}加载并实例化给定类型的工厂实现，使用已配置的类装入器、给定的参数解析器和由给定的故障处理程序提供的自定义故障处理。
 	 * <p>The returned factories are sorted using {@link AnnotationAwareOrderComparator}.
 	 * <p>If duplicate implementation class names are discovered for a given factory
 	 * type, only one instance of the duplicated implementation type will be instantiated.
@@ -194,13 +198,15 @@ public class SpringFactoriesLoader {
 
 		Assert.notNull(factoryType, "'factoryType' must not be null");
 
-		//
+		// 根据指定的类型获取factories中对应的实现类名
 		List<String> implementationNames = loadFactoryNames(factoryType);
 		logger.trace(LogMessage.format("Loaded [%s] names: %s", factoryType.getName(), implementationNames));
+
 		List<T> result = new ArrayList<>(implementationNames.size());
 		FailureHandler failureHandlerToUse = (failureHandler != null) ? failureHandler : THROWING_FAILURE_HANDLER;
+		// 遍历类名列表，实现类
 		for (String implementationName : implementationNames) {
-			// 实例化工厂实现类
+			// 实例化类
 			T factory = instantiateFactory(implementationName, factoryType, argumentResolver, failureHandlerToUse);
 			if (factory != null) {
 				result.add(factory);
@@ -225,7 +231,7 @@ public class SpringFactoriesLoader {
 					"Class [%s] is not assignable to factory type [%s]".formatted(implementationName, type.getName()));
 			// 实例化器
 			FactoryInstantiator<T> factoryInstantiator = FactoryInstantiator.forClass(factoryImplementationClass);
-			// 实例化工厂实现类
+			// 实例化类
 			return factoryInstantiator.instantiate(argumentResolver);
 		}
 		catch (Throwable ex) {
@@ -402,7 +408,7 @@ public class SpringFactoriesLoader {
 		}
 
 		private Object[] resolveArgs(@Nullable ArgumentResolver argumentResolver) {
-			// 参数类型
+			// 构造函数的参数类型
 			Class<?>[] types = this.constructor.getParameterTypes();
 			// 返回符合参数类型的对象数组
 			return (argumentResolver != null ?
@@ -641,6 +647,7 @@ public class SpringFactoriesLoader {
 		 * Handle the {@code failure} that occurred when instantiating the
 		 * {@code factoryImplementationName} that was expected to be of the
 		 * given {@code factoryType}.
+		 * 处理在实例化{@code factoryImplementationName}时发生的{@code失败}，该失败预计是给定的{@code factoryType}。
 		 * @param factoryType the type of the factory
 		 * @param factoryImplementationName the name of the factory implementation
 		 * @param failure the failure that occurred
@@ -675,6 +682,7 @@ public class SpringFactoriesLoader {
 		/**
 		 * Create a new {@link FailureHandler} that handles errors by logging trace
 		 * messages.
+		 * 创建一个新的{@link FailureHandler}，通过记录跟踪消息来处理错误。
 		 * @param logger the logger used to log messages
 		 * @return a new {@link FailureHandler} instance
 		 */
@@ -685,6 +693,7 @@ public class SpringFactoriesLoader {
 		/**
 		 * Create a new {@link FailureHandler} that handles errors using a standard
 		 * formatted message.
+		 * 创建一个新的{@link FailureHandler}，使用标准格式的消息处理错误。
 		 * @param messageHandler the message handler used to handle the problem
 		 * @return a new {@link FailureHandler} instance
 		 */
